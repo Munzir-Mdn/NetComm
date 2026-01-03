@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komunikasi Rangkaian: Lapisan Rangkaian (Satah Data) - Study Guide</title>
+    <!-- Google Fonts - Outfit for display, Lora for body text -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN with extended configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // Custom color palette for a professional academic aesthetic
+                    colors: {
+                        'primary-bg': '#fefefe',      // Muted off-white for main background
+                        'secondary-bg': '#f5f7fa',    // Light gray for subtle component backgrounds/dividers
+                        'accent-blue': '#4a6797',     // Sophisticated slate blue for headings and highlights
+                        'text-dark': '#2c3e50',       // Dark charcoal gray for primary body text (high contrast)
+                        'text-light': '#5e7288',      // Slightly lighter text for secondary information/emphasis
+                    },
+                    // Custom font families imported from Google Fonts
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'], // Modern sans-serif for headings
+                        body: ['Lora', 'serif'],           // Highly readable serif for long-form body text
+                    },
+                    // Custom line height for improved readability
+                    lineHeight: {
+                        'relaxed-plus': '1.75', // Generous line spacing for academic content
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles for smooth scrolling and font anti-aliasing */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            @apply bg-primary-bg text-text-dark font-body antialiased;
+            line-height: 1.75; /* Applying custom line height directly */
+        }
+        /* Consistent heading styles with custom display font and accent color */
+        h1, h2, h3, h4, h5, h6 {
+            @apply font-display text-accent-blue;
+        }
+        h1 { @apply text-4xl lg:text-5xl font-extrabold mb-6 mt-12; }
+        h2 { @apply text-3xl lg:text-4xl font-bold mb-4 mt-10 border-b border-accent-blue/20 pb-2; }
+        h3 { @apply text-2xl lg:text-3xl font-semibold mb-3 mt-8; }
+        h4 { @apply text-xl lg:text-2xl font-medium mb-2 mt-6; }
+
+        /* General paragraph and list styling for readability */
+        p { @apply mb-4; }
+        ul, ol { @apply list-inside mb-4 pl-4; }
+        ul li { @apply list-disc mb-2; }
+        ol li { @apply list-decimal mb-2; }
+        b, strong { @apply font-semibold text-accent-blue; } /* Emphasize key terms with accent color */
+        em { @apply italic text-text-light; } /* Subtle emphasis */
+
+        /* Table of Contents (TOC) specific styling */
+        .toc-link {
+            @apply block py-2 px-4 rounded-lg transition-all duration-200 ease-in-out hover:bg-accent-blue/10 hover:text-accent-blue;
+        }
+        .toc-link.active {
+            @apply bg-accent-blue text-white shadow-lg; /* Highlight active link */
+        }
+
+        /* Practice Question/Answer styling using details/summary for interactivity */
+        details {
+            @apply bg-white rounded-xl shadow-md p-6 mb-6 transition-all duration-300 ease-in-out border border-accent-blue/10;
+        }
+        details[open] {
+            @apply shadow-xl border-accent-blue/30; /* Enhanced shadow and border when open */
+        }
+        summary {
+            @apply cursor-pointer font-display text-xl font-semibold text-accent-blue flex items-center justify-between py-2;
+            user-select: none; /* Prevent text selection on summary toggle */
+        }
+        /* Custom plus/minus icon for summary toggle */
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        summary::after {
+            content: '+';
+            @apply text-2xl font-bold transform transition-transform duration-300;
+        }
+        details[open] summary::after {
+            content: '-'; /* Change icon to minus when expanded */
+        }
+        .model-answer {
+            @apply bg-secondary-bg p-4 rounded-lg mt-4 text-text-dark;
+        }
+        .code-block {
+            @apply bg-gray-100 text-gray-800 p-3 rounded-md font-mono text-sm overflow-x-auto my-3;
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile) */
+        @media (max-width: 1023px) {
+            .sidebar-toc {
+                @apply hidden; /* Hide sticky sidebar TOC on small screens */
+            }
+            .main-content {
+                @apply w-full; /* Main content takes full width */
+            }
+            details summary {
+                @apply text-lg; /* Adjust summary font size */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section: Minimalistic and non-distracting -->
+    <header class="bg-white shadow-sm py-4 px-6 md:px-8 border-b border-accent-blue/10 sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+                <span class="font-display text-2xl font-bold text-accent-blue mr-4">Academic Tutor App</span>
+                <span class="text-xl text-text-light hidden md:block">| Komunikasi Rangkaian</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout: Flexible grid for desktop, single column for mobile -->
+    <div class="container mx-auto px-4 md:px-8 py-10 max-w-7xl flex flex-col lg:flex-row relative">
+
+        <!-- Table of Contents (Sticky Sidebar for larger screens) -->
+        <aside class="w-full lg:w-1/4 pr-8 sticky top-24 h-fit hidden lg:block sidebar-toc">
+            <h3 class="text-xl font-display font-bold mb-4 text-accent-blue">Table of Contents</h3>
+            <nav id="toc-nav" class="space-y-2">
+                <!-- TOC links will be dynamically generated by JavaScript -->
+            </nav>
+        </aside>
+
+        <!-- Main Study Guide Content Area -->
+        <main class="w-full lg:w-3/4 main-content">
+            <h1 class="text-center" id="main-title">Komunikasi Rangkaian: Lapisan Rangkaian (Satah Data)</h1>
+
+            <!-- Section: Introduction/Summary & Basic Definitions -->
+            <section id="introduction" class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-accent-blue/10">
+                <h2 class="text-accent-blue border-none pb-0">Ringkasan dan Definisi Asas</h2>
+                <p>The Network Layer is a critical component in the network protocol stack, responsible for end-to-end communication between hosts. While the Transport Layer handles process-to-process communication, it relies on the Network Layer for host-to-host data delivery. This chapter focuses on the <strong>Data Plane</strong> of the network layer, which manages fast, local packet-forwarding functions. It explores the distinctions between forwarding and routing, router internal mechanisms, Internet Protocol (IP) addressing and formats for IPv4 and IPv6, and essential network services like Dynamic Host Configuration Protocol (DHCP) and Network Address Translation (NAT). The chapter also introduces generalized forwarding and Software-Defined Networking (SDN).</p>
+
+                <h3 class="text-accent-blue" id="basic-definitions-intro">Basic Definitions:</h3>
+                <ul class="list-disc pl-6 text-text-light">
+                    <li><strong>Network Layer:</strong> A protocol layer in the TCP/IP stack responsible for end-to-end communication between hosts; the most complex layer.</li>
+                    <li><strong>Data Plane:</strong> The Network Layer component responsible for fast, local packet-forwarding functions.</li>
+                    <li><strong>Control Plane:</strong> The Network Layer component responsible for network-wide routing logic.</li>
+                    <li><strong>Forwarding:</strong> A router's data plane function that moves packets from an input port to an appropriate output link; a router-local action.</li>
+                    <li><strong>Routing:</strong> The control plane function that determines the path datagrams take from source to destination host; a network-wide process calculated by routing algorithms.</li>
+                    <li><strong>Router:</strong> A network device that examines IP datagram header fields to forward them to the appropriate output link.</li>
+                    <li><strong>IP Datagram:</strong> The basic unit of data at the Network Layer.</li>
+                    <li><strong>IP Address:</strong> A unique 32-bit (IPv4) or 128-bit (IPv6) identifier for a host or router interface in a network.</li>
+                    <li><strong>Subnet:</strong> A logical division of a larger IP network into smaller segments.</li>
+                    <li><strong>Subnet Mask:</strong> A 32-bit set used to separate the network portion from the host portion of an IP address.</li>
+                    <li><strong>IP Fragmentation:</strong> The process of breaking down a large IP datagram into smaller datagrams when it must traverse links with smaller Maximum Transfer Units (MTUs).</li>
+                    <li><strong>MTU (Maximum Transfer Unit):</strong> The largest link-layer frame size that can be transmitted.</li>
+                    <li><strong>DHCP (Dynamic Host Configuration Protocol):</strong> An application protocol allowing hosts to dynamically obtain IP addresses from a network server.</li>
+                    <li><strong>NAT (Network Address Translation):</strong> A mechanism enabling a local network to use a single public IP address for external communication, hiding the private IP addresses of internal devices.</li>
+                    <li><strong>SDN (Software-Defined Networking):</strong> A networking approach where the control plane is separated from the data plane, allowing for more flexible and centralized network management.</li>
+                    <li><strong>OpenFlow:</strong> A standard used in SDN to define how data plane devices (switches, routers) forward packets based on <strong>flow tables</strong>.</li>
+                </ul>
+            </section>
+
+            <!-- Section: Key Concepts -->
+            <section id="key-concepts" class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-accent-blue/10">
+                <h2>Key Concepts</h2>
+                <ul class="list-disc pl-6 text-text-dark">
+                    <li><strong>Goals of the Network Layer:</strong> Understanding principles of network layer services, including service models, <strong>Forwarding</strong> vs. <strong>Routing</strong>, router operation, routing (path selection), and <strong>Generalized Forwarding</strong>.</li>
+                    <li><strong>Network Layer Decomposition:</strong> Divided into:
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Data Plane:</strong> Handles packet movement from router input to output ports. (Chapter 4)</li>
+                            <li><strong>Control Plane:</strong> Determines how datagrams are routed between routers end-to-end. (Chapter 5)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Two Main Network Layer Functions:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Forwarding:</strong> A <strong>router-local action</strong> to move a packet from input to output, implemented in <strong>hardware</strong>.</li>
+                            <li><strong>Routing:</strong> A <strong>network-wide process</strong> to determine the path from source to destination, calculated by <strong>routing algorithms</strong>, implemented in <strong>software</strong>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Control Plane Approaches:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Traditional:</strong> Routing algorithms run within individual routers.</li>
+                            <li><strong>SDN (Software-Defined Networking):</strong> Routing logic runs on <strong>remote controllers</strong>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Network Layer Service Models:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li>Guaranteed delivery.</li>
+                            <li>Guaranteed delivery with bounded delay (e.g., < 40 msec).</li>
+                            <li>In-order packet delivery.</li>
+                            <li>Guaranteed minimal bandwidth between hosts.</li>
+                            <li>Security.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Router Anatomy:</strong> Four main components:
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Input Ports:</strong> Perform physical and data link layer functions, forwarding lookup.</li>
+                            <li><strong>Switching Fabric:</strong> Moves packets from input to output ports.</li>
+                            <li><strong>Output Ports:</strong> Store and forward packets, perform link and physical layer functions.</li>
+                            <li><strong>Routing Processor:</strong> Runs routing algorithms and manages the control plane.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Input Processing:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Decentralized switching:</strong> Uses a <strong>forwarding table</strong> in input port memory ("match plus action").</li>
+                            <li><strong>Queuing:</strong> Occurs when datagram arrival rate exceeds switching fabric rate, causing <strong>delay</strong> and <strong>loss</strong>.</li>
+                            <li><strong>Head-of-the-Line (HOL) blocking:</strong> Packets at the front of a queue block others.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Switching Fabric Types:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Memory:</strong> First-generation routers, speed limited by memory bandwidth.</li>
+                            <li><strong>Bus:</strong> Datagrams move over a shared bus, speed limited by bus bandwidth.</li>
+                            <li><strong>Crossbar:</strong> Advanced design for faster switching, overcoming bus limitations.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Output Port Programming:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Buffering:</strong> Necessary when datagrams arrive faster than they can be transmitted, leading to congestion or buffer exhaustion and packet loss.</li>
+                            <li><strong>Scheduling:</strong> Selects which queued datagram to transmit.</li>
+                        </ul>
+                    </li>
+                    <li><strong>The Internet Protocol (IP):</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>IP Protocol:</strong> Defines addressing conventions, datagram format, and packet handling.</li>
+                            <li><strong>ICMP Protocol:</strong> Used for error reporting and router signaling.</li>
+                        </ul>
+                    </li>
+                    <li><strong>IPv4 Datagram Format:</strong> Fixed 20-byte header (without options), including <strong>version, header length, type of service, datagram length, identification, flags, fragmentation offset, time-to-live (TTL), upper-layer protocol, header checksum, source/destination IP addresses, options, data.</strong></li>
+                    <li><strong>IPv4 Fragmentation:</strong> Large IP datagrams can be <strong>fragmented</strong> if they exceed a link's <strong>MTU</strong>. Reassembly only occurs at the final destination.</li>
+                    <li><strong>IPv4 Addressing:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>IP Address:</strong> 32-bit identifier for host/router interfaces, written in <strong>dotted decimal notation</strong>.</li>
+                            <li><strong>Interface:</strong> Connection between a host/router and a physical link, each with its own IP address.</li>
+                            <li><strong>Subnet:</strong> A group of interfaces sharing the same network portion of their IP address.</li>
+                            <li><strong>Subnet Mask:</strong> Used with logical AND to separate the <strong>network portion</strong> and <strong>host portion</strong> of an IP address. Network bits are '1', host bits are '0'.</li>
+                            <li><strong>Classful Addressing:</strong> An older, wasteful addressing scheme.</li>
+                            <li><strong>Classless InterDomain Routing (CIDR):</strong> A flexible approach using the format <strong>a.b.c.d/x</strong>, where 'x' is the number of bits in the address <strong>prefix</strong> (network portion).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Obtaining IP Addresses:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>For ISPs:</strong> Allocated by <strong>ICANN (Internet Corporation for Assigned Names and Numbers)</strong>.</li>
+                            <li><strong>For Hosts:</strong> From <strong>local ISP</strong> or <strong>local organization</strong> (statically or dynamically).</li>
+                        </ul>
+                    </li>
+                    <li><strong>DHCP (Dynamic Host Configuration Protocol):</strong> A 4-step "plug-and-play" protocol for dynamic IP address acquisition: <strong>DHCP discover, DHCP offer, DHCP request, DHCP ACK</strong>. It enables address reuse and supports mobile users.</li>
+                    <li><strong>NAT (Network Address Translation):</strong> Allows a local network to use a single public IP address for the outside world. A NAT router <strong>replaces</strong> the private source IP/port of outgoing datagrams with the router's public IP/new port and <strong>remembers</strong> this mapping in a <strong>NAT translation table</strong>.</li>
+                    <li><strong>IPv6:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>Motivation:</strong> Near exhaustion of IPv4's 32-bit address space, improved header format for faster processing/forwarding, and simplified QoS.</li>
+                            <li><strong>IPv6 Datagram Format:</strong> Fixed 40-byte header, including <strong>version, traffic class, flow label, payload length, next header, hop limit, source/destination addresses (128-bit)</strong>.</li>
+                            <li><strong>No Fragmentation:</strong> Routers do not perform IPv6 fragmentation.</li>
+                            <li><strong>No Header Checksum:</strong> Removed to reduce processing time at each hop.</li>
+                            <li><strong>Options:</strong> Handled outside the main header, indicated by the "Next Header" field.</li>
+                            <li><strong>ICMPv6:</strong> The new version of ICMP for IPv6.</li>
+                            <li><strong>Transition from IPv4 to IPv6:</strong> Strategies include <strong>dual-stack</strong> (hosts/routers support both IPv4 and IPv6) and <strong>tunneling</strong> (encapsulating IPv6 datagrams within IPv4 datagrams).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Generalized Forwarding and SDN:</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>"Match-plus-action" paradigm:</strong> Routers match packet header fields and perform specific actions.</li>
+                            <li><strong>OpenFlow:</strong> An open standard for generalized forwarding, introducing the <strong>match-plus-action</strong> abstraction and controllers.</li>
+                            <li><strong>Flow Table:</strong> In OpenFlow switches, contains rules (<strong>pattern, actions, priority, counters</strong>) dictating packet forwarding.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Section: Memory Aids -->
+            <section id="memory-aids" class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-accent-blue/10">
+                <h2>Memory Aids</h2>
+                <ul class="list-disc pl-6 text-text-dark">
+                    <li><strong>FWR:</strong> Remember <strong>F</strong>orwarding is a <strong>Local</strong> action (within one router), while <strong>R</strong>outing is a <strong>Global</strong> process (entire network).</li>
+                    <li><strong>DORA (DHCP Process):</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>D</strong>iscover</li>
+                            <li><strong>O</strong>ffer</li>
+                            <li><strong>R</strong>equest</li>
+                            <li><strong>A</strong>CK</li>
+                        </ul>
+                    </li>
+                    <li><strong>IPv4 vs. IPv6 Differences (4 vs. 6):</strong>
+                        <ul class="list-circle pl-6 mt-2">
+                            <li><strong>4</strong> for IPv4, <strong>32-bit</strong> addresses. <strong>6</strong> for IPv6, <strong>128-bit</strong> addresses (4x longer: 32 * 4 = 128 bits).</li>
+                            <li>IPv<strong>4</strong> has <strong>fragmentation</strong>. IPv<strong>6</strong> has no <strong>fragmentation</strong>.</li>
+                            <li>IPv<strong>4</strong> has header <strong>checksum</strong>. IPv<strong>6</strong> has no header <strong>checksum</strong>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>MTU (Maximum Transfer Unit):</strong> Imagine a <strong>M</strong>assive <strong>T</strong>ruck <strong>U</strong>nit that can only carry a certain size of goods. If goods are too big, they must be cut (fragmented) to fit.</li>
+                    <li><strong>Subnet Mask (1s and 0s):</strong> Remember "1" for <strong>network</strong> (same part for all in subnet), "0" for <strong>host</strong> (different part for each host in subnet).</li>
+                </ul>
+            </section>
+
+            <!-- Section: Structured Study Guide with sub-sections -->
+            <section id="structured-study-guide" class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-accent-blue/10">
+                <h2>Structured Study Guide</h2>
+
+                <h3 id="what-to-remember">What to Remember</h3>
+                <ol class="list-decimal pl-6 text-text-dark">
+                    <li><strong>Basic Distinctions:</strong> Clearly differentiate <strong>forwarding</strong> (local action, data plane) from <strong>routing</strong> (network-wide process, control plane).</li>
+                    <li><strong>Router Functions:</strong> Know the four main router components (input ports, switching fabric, output ports, routing processor) and their roles.</li>
+                    <li><strong>IP Addressing:</strong> Understand IP address purpose, differences between IPv4 (32-bit) and IPv6 (128-bit), and how subnet masks work with CIDR.</li>
+                    <li><strong>Network Services:</strong> Grasp the purpose and mechanisms of DHCP (dynamic IP acquisition) and NAT (managing local and public IP addresses).</li>
+                    <li><strong>Queuing Issues:</strong> Understand why queues form in routers (arrival rate > transmission rate), their impact (delay, loss), and HOL blocking.</li>
+                    <li><strong>IPv6 Transition:</strong> Recall the motivations for IPv6 and transition strategies (dual-stack, tunneling).</li>
+                    <li><strong>SDN and OpenFlow:</strong> Understand SDN concepts and how OpenFlow uses "match-plus-action" flow tables for network control.</li>
+                </ol>
+
+                <h3 id="how-concepts-work">How Concepts Work</h3>
+                <ul class="list-disc pl-6 text-text-dark">
+                    <li><strong>Datagram Flow in a Router:</strong> Packets enter input ports, undergo forwarding lookup using a forwarding table (built by the routing processor). They are then switched via the fabric to the correct output port, where they may queue before transmission.</li>
+                    <li><strong>IP Fragmentation:</strong> If a datagram's size exceeds a link's MTU, it's split into fragments. Each fragment gets its own IP header with fragmentation info (ID, flags, offset) for reassembly at the destination.</li>
+                    <li><strong>Subnet Calculation:</strong> Subnet masks are used with logical AND operations on IP addresses to derive subnet addresses, determining if hosts are in the same or different subnets.</li>
+                    <li><strong>DHCP:</strong> A new host broadcasts a "DHCP discover." A DHCP server replies with a "DHCP offer." The host requests the address via "DHCP request," and the server confirms with "DHCP ACK."</li>
+                    <li><strong>NAT:</strong> When a local device sends a packet to the Internet, the NAT router replaces its private source IP and port with the router's public IP and a new unique port. This mapping is stored in the NAT translation table. Replies are routed back using this table.</li>
+                    <li><strong>OpenFlow:</strong> A remote controller (control plane) calculates forwarding rules and loads them into flow tables on OpenFlow switches (data plane). Switches then process incoming packets based on these rules (match header, perform actions like forward, drop, modify).</li>
+                </ul>
+
+                <h3 id="common-student-mistakes">Common Student Mistakes</h3>
+                <ul class="list-disc pl-6 text-text-dark">
+                    <li><strong>Confusing Forwarding and Routing:</strong> Many students equate them. Remember, forwarding is <em>how</em> a packet moves locally; routing is <em>where</em> it goes globally.</li>
+                    <li><strong>Incorrect Subnet Calculations:</strong> Errors in determining host bits, number of subnets, or usable hosts per subnet, especially with network and broadcast addresses.</li>
+                    <li><strong>Misunderstanding NAT:</strong> Assuming NAT merely "translates" addresses without grasping the role of ports and translation tables.</li>
+                    <li><strong>IPv6 Fragmentation Errors:</strong> Believing intermediate routers fragment IPv6 packets, when only the source host can do so.</li>
+                    <li><strong>HOL Blocking:</strong> Not understanding how packets waiting for different output ports can be blocked by packets ahead in a queue for a busy output port.</li>
+                </ul>
+
+                <h3 id="effective-study-tips">Effective Study Tips</h3>
+                <ol class="list-decimal pl-6 text-text-dark">
+                    <li><strong>Use Visualizations:</strong> Diagram routers, data flows, NAT, and DHCP processes.</li>
+                    <li><strong>Practice Calculations:</strong> Work through IP addressing, subnetting (CIDR), and IPv4 fragmentation problems.</li>
+                    <li><strong>Focus on "Why":</strong> Understand the reasons behind protocols and mechanisms (e.g., why IPv6, why NAT, why queues form).</li>
+                    <li><strong>Compare and Contrast:</strong> Create comparison tables for IPv4 vs. IPv6, forwarding vs. routing, data plane vs. control plane, and switching fabric types.</li>
+                    <li><strong>Keywords and Acronyms:</strong> Use memory aids like DORA for DHCP. Understand all bolded technical terms.</li>
+                </ol>
+
+                <h3 id="real-world-applications">Real-World Applications</h3>
+                <ul class="list-disc pl-6 text-text-dark">
+                    <li><strong>Home/Office Networks:</strong> Home routers perform forwarding, routing (basic), DHCP, and NAT.</li>
+                    <li><strong>Global Internet:</strong> Relies on the network layer to route datagrams across millions of routers globally, with routing algorithms constantly calculating optimal paths.</li>
+                    <li><strong>Internet Service Providers (ISPs):</strong> Use CIDR for efficient IP address allocation and network management.</li>
+                    <li><strong>Data Centers:</strong> Increasingly use SDN and OpenFlow for flexible, automated, and resource-optimized large-scale network management.</li>
+                    <li><strong>Mobile Devices:</strong> Smartphones and tablets use DHCP to automatically obtain IP addresses on new Wi-Fi networks.</li>
+                </ul>
+            </section>
+
+            <!-- Section: Practice Questions & Answers (interactive) -->
+            <section id="practice-questions" class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-accent-blue/10">
+                <h2>Practice Questions & Answers</h2>
+
+                <!-- Question 1 -->
+                <details class="mb-4">
+                    <summary>Question 1: Queuing Buffer Sizing</summary>
+                    <div class="text-text-dark">
+                        <p>A router's link capacity is 20 Mbps, and the RTT for a single packet is 400 msec.</p>
+                        <p>(a) Calculate the average buffer size required.</p>
+                        <p>(b) If there are 16 TCP flows, calculate the buffer size required based on recent recommendations.</p>
+                        <div class="model-answer">
+                            <h4 class="text-lg font-display font-semibold text-accent-blue mb-2">Model Answer 1:</h4>
+                            <p>Given: Link Capacity, C = 20 Mbps; RTT = 400 msec; TCP Flows, N = 16</p>
+                            <p>(a) Average Buffer Size = RTT x C</p>
+                            <pre class="code-block">
+= 400 msec x 20 Mbps
+= 0.4 sec x 20 Mbps
+= <strong>8 Mb</strong></pre>
+                            <p>(b) Buffer Size (with TCP flows) = (RTT x C) / √N</p>
+                            <pre class="code-block">
+= 8 Mb / √16
+= 8 Mb / 4
+= <strong>2 Mb</strong></pre>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Question 2 -->
+                <details class="mb-4">
+                    <summary>Question 2: IPv4 Fragmentation</summary>
+                    <div class="text-text-dark">
+                        <p>A 5000-byte datagram arrives at a router and needs to be sent to a link with an MTU of 1500 bytes. Assume the original datagram has an identification number of 333. Draw all resulting IP fragments reflecting the original data payload.</p>
+                        <div class="model-answer">
+                            <h4 class="text-lg font-display font-semibold text-accent-blue mb-2">Model Answer 2:</h4>
+                            <p>Original Datagram: Size = 5000 bytes; ID = 333; Flags = 0; Offset = 0.</p>
+                            <p>Payload size: 5000 bytes (total) - 20 bytes (IP header) = 4980 bytes.</p>
+                            <p>Max payload per fragment (MTU 1500): 1500 bytes - 20 bytes (header) = 1480 bytes.</p>
+                            <p>Fragment offset is in 8-byte units: 1480 / 8 = 185.</p>
+                            <p>Number of fragments = ceil(4980 / 1480) = 4 fragments.</p>
+                            <ul class="list-disc pl-6 mt-4">
+                                <li><strong>Fragment #1:</strong>
+                                    <ul class="list-circle pl-6 mt-1">
+                                        <li>Length: 1500 bytes</li>
+                                        <li>ID: 333</li>
+                                        <li>Flags: 1 (more fragments follow)</li>
+                                        <li>Offset: 0 (0 / 8)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Fragment #2:</strong>
+                                    <ul class="list-circle pl-6 mt-1">
+                                        <li>Length: 1500 bytes</li>
+                                        <li>ID: 333</li>
+                                        <li>Flags: 1</li>
+                                        <li>Offset: 185 (1480 / 8)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Fragment #3:</strong>
+                                    <ul class="list-circle pl-6 mt-1">
+                                        <li>Length: 1500 bytes</li>
+                                        <li>ID: 333</li>
+                                        <li>Flags: 1</li>
+                                        <li>Offset: 370 (2960 / 8)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Fragment #4:</strong>
+                                    <ul class="list-circle pl-6 mt-1">
+                                        <li>Remaining payload: 4980 - (3 * 1480) = 540 bytes</li>
+                                        <li>Length: 20 (header) + 540 (payload) = 560 bytes</li>
+                                        <li>ID: 333</li>
+                                        <li>Flags: 0 (last fragment)</li>
+                                        <li>Offset: 555 (4440 / 8)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Question 3 -->
+                <details class="mb-4">
+                    <summary>Question 3: Subnet Mask Calculation</summary>
+                    <div class="text-text-dark">
+                        <p>Find the dotted decimal subnet mask for the following prefixes:</p>
+                        <p>(a) /10</p>
+                        <p>(b) /22</p>
+                        <p>(c) /28</p>
+                        <div class="model-answer">
+                            <h4 class="text-lg font-display font-semibold text-accent-blue mb-2">Model Answer 3:</h4>
+                            <p>(a) <strong>/10:</strong> 10 bits are '1', rest are '0'.</p>
+                            <pre class="code-block">
+`11111111.11000000.00000000.00000000` = <strong>255.192.0.0</strong></pre>
+                            <p>(b) <strong>/22:</strong> 22 bits are '1', rest are '0'.</p>
+                            <pre class="code-block">
+`11111111.11111111.11111100.00000000` = <strong>255.255.252.0</strong></pre>
+                            <p>(c) <strong>/28:</strong> 28 bits are '1', rest are '0'.</p>
+                            <pre class="code-block">
+`11111111.11111111.11111111.11110000` = <strong>255.255.255.240</strong></pre>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Question 4 -->
+                <details class="mb-4">
+                    <summary>Question 4: CIDR Subnetting</summary>
+                    <div class="text-text-dark">
+                        <p>A company has the IP address 192.168.1.0/24 and needs to divide it into 4 subnets for different departments.</p>
+                        <p>(a) What is the new subnet mask in slash and dotted decimal notation for each new subnet?</p>
+                        <p>(b) How many maximum hosts can each subnet support?</p>
+                        <p>(c) List the network address, broadcast address, and usable IP range for the first subnet (subnet 0).</p>
+                        <div class="model-answer">
+                            <h4 class="text-lg font-display font-semibold text-accent-blue mb-2">Model Answer 4:</h4>
+                            <p>Given original IP: 192.168.1.0/24; Required subnets = 4.</p>
+                            <p>To get 4 subnets, 2 bits must be borrowed from the host portion (2^2 = 4).</p>
+                            <p>New prefix length = /24 + 2 = /26.</p>
+
+                            <p>(a) <strong>New subnet mask:</strong></p>
+                            <p>Slash notation: <strong>/26</strong></p>
+                            <p>Dotted decimal: 26 bits are '1'.</p>
+                            <pre class="code-block">
+`11111111.11111111.11111111.11000000` = <strong>255.255.255.192</strong></pre>
+
+                            <p>(b) <strong>Maximum hosts per subnet:</strong></p>
+                            <p>Remaining host bits = 32 - 26 = 6 bits.</p>
+                            <p>Number of hosts = 2^6 - 2 (excluding network and broadcast addresses) = 64 - 2 = <strong>62 hosts</strong>.</p>
+
+                            <p>(c) <strong>For the first subnet (Subnet 0):</strong></p>
+                            <p>Network portion: 192.168.1.00xxxxxx (host bits start with 000000)</p>
+                            <ul class="list-circle pl-6 mt-1">
+                                <li><strong>Network Address:</strong> 192.168.1.0</li>
+                                <li><strong>Broadcast Address:</strong> 192.168.1.63</li>
+                                <li><strong>Usable IP Range:</strong> 192.168.1.1 to 192.168.1.62</li>
+                            </ul>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Question 5 -->
+                <details class="mb-4">
+                    <summary>Question 5: DHCP Process Steps</summary>
+                    <div class="text-text-dark">
+                        <p>Describe the four main steps in the DHCP process when a host connects to a network.</p>
+                        <div class="model-answer">
+                            <h4 class="text-lg font-display font-semibold text-accent-blue mb-2">Model Answer 5:</h4>
+                            <p>The four main steps in the DHCP process, known as DORA:</p>
+                            <ol class="list-decimal pl-6 mt-4">
+                                <li><strong>DHCP Discover:</strong> A new host broadcasts a "DHCP Discover" message (destination IP 255.255.255.255, UDP port 67) to find a DHCP server.</li>
+                                <li><strong>DHCP Offer:</strong> A DHCP server responds with a "DHCP Offer" message, proposing an IP address, subnet mask, default gateway, DNS server addresses, and lease duration.</li>
+                                <li><strong>DHCP Request:</strong> The host selects an offer and broadcasts a "DHCP Request" message to formally request the offered IP address from the chosen server.</li>
+                                <li><strong>DHCP ACK (Acknowledgement):</strong> The server sends a "DHCP ACK" message to confirm the IP address lease and provide all necessary configuration information. The host can now use the IP address.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Question 6 -->
+                <details class="mb-4">
+                    <summary>Question 6: Key Differences between IPv4 and IPv6</summary>
+                    <div class="text-text-dark">
+                        <p>State three key differences between IPv4 and IPv6.</p>
+                        <div class="model-answer">
+                            <h4 class="text-lg font-display font-semibold text-accent-blue mb-2">Model Answer 6:</h4>
+                            <ol class="list-decimal pl-6 mt-4">
+                                <li><strong>Address Length:</strong> IPv4 uses 32-bit addresses (approx. 4.3 billion unique addresses). IPv6 uses 128-bit addresses (approx. 3.4 x 10^38 unique addresses), solving IPv4 address exhaustion.</li>
+                                <li><strong>Fragmentation:</strong> IPv4 allows intermediate routers to fragment datagrams. IPv6 does not allow intermediate router fragmentation; only the source host can fragment.</li>
+                                <li><strong>Header Checksum:</strong> IPv4 headers include a checksum for error detection. IPv6 headers omit the checksum to reduce router processing time, relying on lower and upper layers for error checking.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </details>
+
+            </section>
+
+            <!-- Section: Conclusion -->
+            <section id="conclusion" class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-accent-blue/10">
+                <h2>Conclusion</h2>
+                <p>The Data Plane of the Network Layer is fundamental to modern network communication, handling critical tasks like efficient local packet forwarding. Understanding the distinctions between forwarding and routing, router internals (including queuing), IP addressing (IPv4 and IPv6), fragmentation, DHCP, and NAT is essential. The transition to IPv6 and the emergence of Software-Defined Networking (SDN) with OpenFlow reflect the continuous evolution of network management and optimization. Mastering these concepts provides deep insight into how the Internet functions and equips learners with vital skills for networking careers.</p>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tocNav = document.getElementById('toc-nav');
+            const mainContent = document.querySelector('main');
+
+            // Ensure main h1 has an ID for TOC linking
+            const mainTitleH1 = document.getElementById('main-title');
+            if (mainTitleH1 && !mainTitleH1.id) {
+                mainTitleH1.id = 'komunikasi-rangkaian-main-title';
+            }
+
+            // Assign IDs to H3s within "Structured Study Guide" if they don't have them
+            const structuredGuideH3s = document.querySelectorAll('#structured-study-guide h3');
+            structuredGuideH3s.forEach(header => {
+                if (!header.id) {
+                    // Generate a simple slug-like ID from text content
+                    header.id = header.textContent.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                }
+            });
+            
+            // Collect all elements to be included in TOC and observed by IntersectionObserver
+            const allTOCableElements = Array.from(mainContent.querySelectorAll('h1[id], section[id] h2, section[id] h3[id]'));
+
+            // Function to generate the Table of Contents dynamically
+            function generateTOC() {
+                tocNav.innerHTML = ''; // Clear existing TOC before regenerating
+
+                allTOCableElements.forEach(element => {
+                    let id = element.id;
+                    let text = element.textContent;
+                    let indentClass = '';
+                    let fontWeightClass = 'font-semibold';
+                    let textSizeClass = 'text-base';
+                    let textColorClass = '';
+
+                    // Determine styling based on heading level
+                    if (element.tagName === 'H1') {
+                        textSizeClass = 'text-lg';
+                    } else if (element.tagName === 'H3') {
+                        indentClass = 'ml-6'; // Indent H3s
+                        fontWeightClass = 'font-normal';
+                        textSizeClass = 'text-sm';
+                        textColorClass = 'text-text-light';
+                    }
+
+                    if (id) {
+                        const link = document.createElement('a');
+                        link.href = `#${id}`;
+                        link.textContent = text;
+                        link.classList.add('toc-link', indentClass, fontWeightClass, textSizeClass, textColorClass);
+                        link.setAttribute('data-target-id', id);
+                        tocNav.appendChild(link);
+                    }
+                });
+            }
+
+            generateTOC(); // Initial TOC generation after IDs are set
+
+            // Intersection Observer for highlighting active TOC links during scroll
+            const options = {
+                root: null, // viewport as the root
+                rootMargin: '-20% 0px -50% 0px', // Adjust margin to trigger link activation when section is in top half of viewport
+                threshold: 0 // Trigger when any part of the target enters/exits root
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const targetId = entry.target.id;
+                    const correspondingLink = tocNav.querySelector(`.toc-link[data-target-id="${targetId}"]`);
+
+                    if (correspondingLink) {
+                        if (entry.isIntersecting) {
+                            // Deactivate all other active links
+                            tocNav.querySelectorAll('.toc-link.active').forEach(link => {
+                                link.classList.remove('active');
+                            });
+                            // Activate the current link
+                            correspondingLink.classList.add('active');
+                        } else {
+                            // If not intersecting, remove active class (can be improved to keep last active)
+                            correspondingLink.classList.remove('active');
+                        }
+                    }
+                });
+            }, options);
+
+            // Observe all relevant elements for scroll tracking
+            allTOCableElements.forEach(element => {
+                observer.observe(element);
+            });
+
+            // Smooth scroll functionality for TOC links
+            tocNav.addEventListener('click', (event) => {
+                if (event.target.classList.contains('toc-link')) {
+                    event.preventDefault(); // Prevent default anchor jump
+                    const targetId = event.target.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        // Calculate scroll position with an offset for the fixed header
+                        const headerOffset = document.querySelector('header').offsetHeight + 20; // +20 for extra padding
+                        const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+                        window.scrollTo({
+                            top: elementPosition - headerOffset,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

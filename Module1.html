@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ms" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Belajar: Rangkaian Komputer dan Internet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': 'hsl(210, 60%, 40%)', // Deep, sophisticated blue
+                        'secondary-blue': 'hsl(210, 60%, 85%)', // Pale blue for highlights
+                        'background-light': 'hsl(0, 0%, 98%)', // Faded white/light grey
+                        'text-charcoal': 'hsl(220, 15%, 25%)', // Dark charcoal grey
+                        'divider-light': 'hsl(210, 20%, 90%)', // Soft neutral grey-blue
+                    },
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        body: ['Lora', 'serif'],
+                    },
+                    boxShadow: {
+                        'custom-light': '0 4px 15px rgba(0, 0, 0, 0.05)',
+                        'custom-medium': '0 8px 30px rgba(0, 0, 0, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            color: hsl(220, 15%, 25%);
+            background-color: hsl(0, 0%, 98%);
+            line-height: 1.7; /* Enhanced readability */
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            color: hsl(210, 60%, 40%);
+            line-height: 1.2;
+        }
+        /* Custom scrollbar for a sleeker look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: hsl(0, 0%, 95%);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: hsl(210, 60%, 80%);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: hsl(210, 60%, 70%);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, hsl(210, 60%, 90%) 0%, hsl(210, 60%, 95%) 100%);
+        }
+        .section-separator {
+            @apply w-24 h-1 rounded-full bg-secondary-blue my-8 mx-auto;
+        }
+        .content-card {
+            @apply bg-white p-8 md:p-10 rounded-xl shadow-custom-light transition-all duration-300 hover:shadow-custom-medium;
+        }
+        .jump-link:hover {
+            text-decoration: underline;
+            color: hsl(210, 60%, 30%);
+        }
+    </style>
+</head>
+<body class="antialiased text-text-charcoal bg-background-light">
+
+    <!-- Header -->
+    <header class="bg-primary-blue text-white py-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+            <div class="text-xl md:text-2xl font-display font-semibold mb-2 md:mb-0">Academic Tutor App</div>
+            <h1 class="text-lg md:text-xl font-display text-center">Pengenalan kepada Rangkaian Komputer dan Internet</h1>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 py-10 md:py-12 max-w-4xl">
+
+        <!-- Main Title & Introduction -->
+        <section id="top" class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Panduan Belajar: <br>Rangkaian Komputer dan Internet</h1>
+            <p class="text-lg md:text-xl text-text-charcoal/80 max-w-2xl mx-auto">Modul komprehensif ini menyediakan pengenalan fundamental kepada rangkaian komputer dan Internet, merangkumi struktur, operasi, prestasi, seni bina, keselamatan, dan sejarahnya.</p>
+        </section>
+
+        <!-- Jump-to Table of Contents -->
+        <section class="mb-12 content-card gradient-bg border border-divider-light">
+            <details class="group">
+                <summary class="flex justify-between items-center cursor-pointer text-xl font-display font-bold text-primary-blue hover:text-primary-blue/90 transition-colors duration-200">
+                    <span>Jadual Kandungan</span>
+                    <span class="transform group-open:rotate-180 transition-transform duration-200">
+                        <svg class="w-6 h-6 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </span>
+                </summary>
+                <nav class="mt-4 text-text-charcoal text-lg">
+                    <ul class="space-y-2">
+                        <li><a href="#ringkasan" class="block py-1 hover:text-primary-blue/80 transition-colors duration-200">1. Ringkasan dan Definisi Asas</a></li>
+                        <li><a href="#konsep-utama" class="block py-1 hover:text-primary-blue/80 transition-colors duration-200">2. Konsep Utama</a></li>
+                        <li><a href="#bantuan-memori" class="block py-1 hover:text-primary-blue/80 transition-colors duration-200">3. Bantuan Memori</a></li>
+                        <li><a href="#panduan-berstruktur" class="block py-1 hover:text-primary-blue/80 transition-colors duration-200">4. Panduan Belajar Berstruktur</a></li>
+                        <li><a href="#soalan-latihan" class="block py-1 hover:text-primary-blue/80 transition-colors duration-200">5. Soalan Latihan & Jawapan</a></li>
+                        <li><a href="#kesimpulan" class="block py-1 hover:text-primary-blue/80 transition-colors duration-200">6. Kesimpulan</a></li>
+                    </ul>
+                </nav>
+            </details>
+        </section>
+
+        <!-- Ringkasan dan Definisi Asas -->
+        <section id="ringkasan" class="mb-12 content-card">
+            <h2 class="text-3xl font-bold mb-6">Ringkasan dan Definisi Asas</h2>
+            <p class="mb-4">Modul ini merangkumi pengenalan fundamental kepada rangkaian komputer dan Internet, termasuk struktur asas, mekanisme operasi, faktor prestasi, model seni bina, aspek keselamatan, dan sejarahnya.</p>
+            <ul class="list-disc pl-5 space-y-2">
+                <li><strong>Internet:</strong> Rangkaian global "rangkaian rangkaian" yang menghubungkan berjuta-juta peranti pengkomputeran.</li>
+                <li><strong>Protokol:</strong> Set peraturan formal untuk komunikasi rangkaian.</li>
+                <li><strong>Hos (Sistem Hujung):</strong> Peranti pengkomputeran yang disambungkan ke Internet (cth., komputer riba, telefon pintar, pelayan).</li>
+                <li><strong>Pautan Komunikasi:</strong> Medium fizikal yang menghubungkan peranti (cth., gentian optik, kabel tembaga, gelombang radio).</li>
+                <li><strong>Penghala (Router):</strong> Peranti yang meneruskan paket data antara pautan.</li>
+                <li><strong>Lebar Jalur (Bandwidth):</strong> Kadar maksimum penghantaran data (diukur dalam bps).</li>
+            </ul>
+        </section>
+
+        <div class="section-separator"></div>
+
+        <!-- Konsep Utama -->
+        <section id="konsep-utama" class="mb-12 content-card">
+            <h2 class="text-3xl font-bold mb-6">Konsep Utama</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Struktur Internet:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Pinggir Rangkaian (Network Edge):</strong> Hos seperti <strong>pelayan</strong> dan <strong>klien</strong>.</li>
+                        <li><strong>Rangkaian Akses (Access Network):</strong> Menghubungkan sistem hujung ke penghala tepi. Termasuk:
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Akses Rumah:</strong> <strong>DSL</strong> (menggunakan talian telefon), <strong>Rangkaian Kabel</strong> (HFC - Hybrid Fiber Coax).</li>
+                                <li><strong>Akses Perusahaan:</strong> <strong>Ethernet Berwayar</strong> (wayar kuprum pasangan terpiuh), <strong>Wi-Fi</strong> (802.11b/g).</li>
+                                <li><strong>Akses Tanpa Wayar Kawasan Luas:</strong> Operator selular (<strong>3G, 4G LTE</strong>).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Media Fizikal:</strong>
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Media Berpandu:</strong> Isyarat dipandu melalui medium pepejal (cth., <strong>kabel pasangan terpiuh</strong>, <strong>kabel sepaksi</strong>, <strong>kabel gentian optik</strong>).</li>
+                                <li><strong>Media Tidak Berpandu:</strong> Isyarat bergerak bebas (cth., <strong>saluran radio terestrial</strong>, <strong>LAN tanpa wayar</strong>, <strong>satelit</strong>).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Teras Rangkaian (Network Core):</strong> Jaringan <strong>suis paket</strong> (penghala & suis lapisan pautan) dan <strong>pautan</strong>.
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Rangkaian Rangkaian:</strong> Internet dibina daripada Rangkaian Pembekal Perkhidmatan Internet (ISP) yang saling berhubung.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Kaedah Penukaran Data:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Penukaran Paket (Packet Switching):</strong> Mesej dipecah menjadi <strong>paket</strong>. Setiap paket dihantar secara individu.
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Store-and-Forward:</strong> Seluruh paket diterima sebelum dihantar.</li>
+                                <li><strong>Kelewatan Penghantaran (d_trans):</strong> Masa untuk menghantar semua bit paket ke pautan.</li>
+                                <li><strong>Kelewatan Beratur (Queuing Delay):</strong> Masa menunggu di penimbal penghala.</li>
+                                <li><strong>Kehilangan Paket (Packet Loss):</strong> Berlaku apabila penimbal penghala penuh.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Penukaran Litar (Circuit Switching):</strong> Sumber rangkaian dikhaskan untuk "panggilan".
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Pembahagian Frekuensi Multipleks (FDM):</strong> Menggunakan jalur frekuensi yang berbeza.</li>
+                                <li><strong>Pembahagian Masa Multipleks (TDM):</strong> Menggunakan slot masa yang berbeza.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Prestasi Rangkaian:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Kelewatan Nodal Penuh (Total Nodal Delay):</strong> $d_{nodal} = d_{proc} + d_{queue} + d_{trans} + d_{prop}$.
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Kelewatan Pemprosesan (d_proc):</strong> Menyemak ralat, menentukan pautan keluar.</li>
+                                <li><strong>Kelewatan Perambatan (d_prop):</strong> Masa untuk bit bergerak sepanjang pautan (d/s).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Daya Pemprosesan (Throughput):</strong> Kadar penghantaran bit.
+                            <ul class="list-circle pl-8 space-y-1">
+                                <li><strong>Pautan Botol Leher (Bottleneck Link):</strong> Pautan dengan kapasiti terendah yang mengehadkan daya pemprosesan keseluruhan.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Lapisan Protokol dan Model Perkhidmatan:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Seni Bina Berlapis (Layered Architecture):</strong> Menguruskan kerumitan rangkaian dengan membahagikannya kepada lapisan fungsi.</li>
+                        <li><strong>Model Rujukan OSI:</strong> 7 lapisan: Aplikasi, Persembahan, Sesi, Pengangkutan, Rangkaian, Pautan Data, Fizikal.</li>
+                        <li><strong>Timbunan Protokol TCP/IP:</strong> 5 lapisan: Aplikasi (FTP, SMTP, HTTP), Pengangkutan (TCP, UDP), Rangkaian (IP), Pautan (Ethernet, Wi-Fi), Fizikal.</li>
+                        <li><strong>Enkapsulasi (Encapsulation):</strong> Data dibalut dengan pengepala dari lapisan bawah semasa bergerak ke bawah timbunan protokol.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Keselamatan Rangkaian:</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Malware:</strong> Perisian berniat jahat (<strong>Virus</strong>, <strong>Worms</strong>, <strong>Spyware</strong>).</li>
+                        <li><strong>Serangan Penafian Perkhidmatan (DoS):</strong> Menjadikan sumber rangkaian tidak tersedia.</li>
+                        <li><strong>Pengintipan Paket (Packet Sniffing):</strong> Mencuri maklumat dengan membaca paket data.</li>
+                        <li><strong>Penyamaran IP (IP Spoofing):</strong> Menghantar paket dengan alamat sumber palsu.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Sejarah Rangkaian Komputer dan Internet:</h3>
+                    <p>Evolusi dari ARPAnet (1960-an) kepada Internet komersial global moden.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-separator"></div>
+
+        <!-- Bantuan Memori (Memory Aids) -->
+        <section id="bantuan-memori" class="mb-12 content-card gradient-bg border border-divider-light">
+            <h2 class="text-3xl font-bold mb-6">Bantuan Memori (Memory Aids)</h2>
+            <ul class="list-disc pl-5 space-y-4">
+                <li>
+                    <h3 class="text-xl font-semibold text-primary-blue/90 mb-1">Lapisan Model OSI (7 Lapisan, Atas ke Bawah):</h3>
+                    <p>Akronim <em>"Aku Pergi Sesi Tengah Rancang Proses Fail"</em> (Aplikasi, Persembahan, Sesi, Transport, Rangkaian, Pautan Data, Fizikal).</p>
+                </li>
+                <li>
+                    <h3 class="text-xl font-semibold text-primary-blue/90 mb-1">Komponen Kelewatan Nodal (4D):</h3>
+                    <p>Ingat "4D" untuk <strong>P</strong>emprosesan, <strong>Q</strong>ueue, <strong>T</strong>ransmisi, <strong>P</strong>erambatan.</p>
+                </li>
+                <li>
+                    <h3 class="text-xl font-semibold text-primary-blue/90 mb-1">Penukaran Paket vs. Penukaran Litar:</h3>
+                    <p><strong>Paket:</strong> Seperti menghantar parcel, dihantar berasingan, fleksibel.</p>
+                    <p><strong>Litar:</strong> Seperti panggilan telefon, laluan khusus dikhaskan, jaminan perkhidmatan.</p>
+                </li>
+                <li>
+                    <h3 class="text-xl font-semibold text-primary-blue/90 mb-1">Media Berpandu vs. Tidak Berpandu:</h3>
+                    <p><strong>Berpandu:</strong> Ada "jalan" fizikal (kabel).</p>
+                    <p><strong>Tidak Berpandu:</strong> Bergerak di "udara" (radio).</p>
+                </li>
+            </ul>
+        </section>
+
+        <div class="section-separator"></div>
+
+        <!-- Panduan Belajar Berstruktur -->
+        <section id="panduan-berstruktur" class="mb-12 content-card">
+            <h2 class="text-3xl font-bold mb-6">Panduan Belajar Berstruktur</h2>
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Perkara Penting untuk Diingati:</h3>
+                    <p>Peranan komponen rangkaian, jenis rangkaian akses, media fizikal, kaedah penukaran, formula kelewatan/daya pemprosesan, kesan pautan botol leher, lapisan model OSI/TCP/IP, dan ancaman keselamatan.</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Bagaimana Konsep Berfungsi:</h3>
+                    <p>Visualisasikan aliran data, bandingkan penukaran paket/litar, fahami interaksi lapisan dan enkapsulasi.</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Kesilapan Lazim Pelajar:</h3>
+                    <p>Kekeliruan kelewatan, mengabaikan pautan botol leher, salah faham fungsi lapisan, meremehkan keselamatan.</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Tips Belajar Berkesan:</h3>
+                    <p>Lukiskan rajah, latih soalan pengiraan, gunakan analogi, kaji kes nyata.</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-3 text-primary-blue/90">Aplikasi Dunia Nyata:</h3>
+                    <p>Akses Internet domestik (DSL, kabel, Wi-Fi), telekomunikasi mudah alih (3G, 4G), e-dagang, perkhidmatan awan, rumah pintar.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-separator"></div>
+
+        <!-- Soalan Latihan dengan Model Jawapan -->
+        <section id="soalan-latihan" class="mb-12 content-card gradient-bg border border-divider-light">
+            <h2 class="text-3xl font-bold mb-8">Soalan Latihan dengan Model Jawapan</h2>
+
+            <div class="space-y-6">
+                <!-- Soalan 1 -->
+                <details class="group p-4 bg-white rounded-lg shadow-sm border border-divider-light hover:shadow-md transition-shadow duration-200">
+                    <summary class="flex justify-between items-center cursor-pointer text-lg font-semibold text-primary-blue/90 hover:text-primary-blue transition-colors duration-200">
+                        <span>1. Apakah perbezaan utama antara Pinggir Rangkaian dan Teras Rangkaian?</span>
+                        <span class="transform group-open:rotate-180 transition-transform duration-200">
+                            <svg class="w-5 h-5 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-divider-light text-text-charcoal">
+                        <p class="mb-2"><strong>Pinggir Rangkaian:</strong> Sistem hujung tempat aplikasi berjalan (cth., <strong>komputer riba</strong>, <strong>pelayan</strong>).</p>
+                        <p><strong>Teras Rangkaian:</strong> Suis paket (penghala, suis lapisan pautan) dan pautan yang membentuk tulang belakang (cth., <strong>penghala</strong>, <strong>suis paket</strong>).</p>
+                    </div>
+                </details>
+
+                <!-- Soalan 2 -->
+                <details class="group p-4 bg-white rounded-lg shadow-sm border border-divider-light hover:shadow-md transition-shadow duration-200">
+                    <summary class="flex justify-between items-center cursor-pointer text-lg font-semibold text-primary-blue/90 hover:text-primary-blue transition-colors duration-200">
+                        <span>2. Terangkan perbezaan antara Media Berpandu dan Media Tidak Berpandu. Berikan contoh bagi setiap satu.</span>
+                        <span class="transform group-open:rotate-180 transition-transform duration-200">
+                            <svg class="w-5 h-5 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-divider-light text-text-charcoal">
+                        <p class="mb-2"><strong>Media Berpandu:</strong> Isyarat dipandu melalui medium pepejal (cth., <strong>kabel gentian optik</strong>).</p>
+                        <p><strong>Media Tidak Berpandu:</strong> Isyarat bergerak bebas (cth., <strong>gelombang radio Wi-Fi</strong>).</p>
+                    </div>
+                </details>
+
+                <!-- Soalan 3 -->
+                <details class="group p-4 bg-white rounded-lg shadow-sm border border-divider-light hover:shadow-md transition-shadow duration-200">
+                    <summary class="flex justify-between items-center cursor-pointer text-lg font-semibold text-primary-blue/90 hover:text-primary-blue transition-colors duration-200">
+                        <span>3. Sebuah fail bersaiz 30 Mbit perlu dihantar melalui pautan dengan kadar 10 Mbps dan jarak 10 km. Kelajuan perambatan adalah $2 \times 10^8$ m/s.</span>
+                        <span class="transform group-open:rotate-180 transition-transform duration-200">
+                            <svg class="w-5 h-5 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-divider-light text-text-charcoal">
+                        <p class="mb-2">a) Kirakan kelewatan penghantaran ($d_{trans}$) fail tersebut.</p>
+                        <p class="mb-2">b) Kirakan kelewatan hujung ke hujung (end-to-end delay) jika kelewatan pemprosesan dan beratur diabaikan.</p>
+                        <p class="mb-2">c) Berapa banyak bit yang telah dihantar apabila bit pertama tiba di hujung pautan?</p>
+                        <p class="mt-4 font-semibold">Jawapan Model:</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>a) <strong>Kelewatan Penghantaran ($d_{trans}$):</strong> $(30 \times 10^6 \text{ bit}) / (10 \times 10^6 \text{ bps}) = 3$ saat.</li>
+                            <li>b) <strong>Kelewatan Hujung ke Hujung:</strong> $d_{prop} = (10 \times 10^3 \text{ m}) / (2 \times 10^8 \text{ m/s}) = 0.00005$ saat. Kelewatan Hujung ke Hujung = $3 + 0.00005 = 3.00005$ saat.</li>
+                            <li>c) <strong>Bit dihantar apabila bit pertama tiba:</strong> $R \times d_{prop} = (10 \times 10^6 \text{ bps}) \times (0.00005 \text{ s}) = 500$ bit.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- Soalan 4 -->
+                <details class="group p-4 bg-white rounded-lg shadow-sm border border-divider-light hover:shadow-md transition-shadow duration-200">
+                    <summary class="flex justify-between items-center cursor-pointer text-lg font-semibold text-primary-blue/90 hover:text-primary-blue transition-colors duration-200">
+                        <span>4. Apakah itu serangan Penafian Perkhidmatan (DoS) dalam konteks keselamatan rangkaian?</span>
+                        <span class="transform group-open:rotate-180 transition-transform duration-200">
+                            <svg class="w-5 h-5 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-divider-light text-text-charcoal">
+                        <p><strong>Serangan Penafian Perkhidmatan (DoS):</strong> Penyerang membanjiri sasaran dengan trafik palsu atau permintaan berlebihan untuk menjadikannya tidak tersedia kepada pengguna yang sah.</p>
+                    </div>
+                </details>
+
+                <!-- Soalan 5 -->
+                <details class="group p-4 bg-white rounded-lg shadow-sm border border-divider-light hover:shadow-md transition-shadow duration-200">
+                    <summary class="flex justify-between items-center cursor-pointer text-lg font-semibold text-primary-blue/90 hover:text-primary-blue transition-colors duration-200">
+                        <span>5. Namakan lima lapisan dalam timbunan protokol TCP/IP (dari atas ke bawah) dan terangkan dua manfaat utama seni bina berlapis.</span>
+                        <span class="transform group-open:rotate-180 transition-transform duration-200">
+                            <svg class="w-5 h-5 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-divider-light text-text-charcoal">
+                        <p class="mb-2">a) <strong>Lapisan TCP/IP (Atas ke Bawah):</strong> Aplikasi, Pengangkutan, Rangkaian, Pautan, Fizikal.</p>
+                        <p class="mb-2">b) <strong>Manfaat Seni Bina Berlapis:</strong></p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li><strong>Modulari:</strong> Memudahkan pengurusan dan pembangunan sistem rangkaian yang kompleks.</li>
+                            <li><strong>Interoperability dan Standardisasi:</strong> Membolehkan peranti dan sistem yang berbeza dari vendor yang berlainan berfungsi bersama.</li>
+                            <li><strong>Fleksibiliti:</strong> Perubahan dalam satu lapisan tidak menjejaskan lapisan yang lain, membolehkan inovasi dan peningkatan berasingan.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <div class="section-separator"></div>
+
+        <!-- Kesimpulan -->
+        <section id="kesimpulan" class="mb-12 content-card">
+            <h2 class="text-3xl font-bold mb-6">Kesimpulan</h2>
+            <p>Modul ini menyediakan pengenalan menyeluruh kepada prinsip-prinsip asas rangkaian komputer dan Internet, meliputi struktur, penghantaran data, prestasi, model protokol, keselamatan, dan sejarah. Pemahaman konsep-konsep ini adalah penting untuk mendalami bidang rangkaian komputer.</p>
+        </section>
+
+    </div>
+
+</body>
+</html>

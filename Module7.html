@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireless & Mobile Networks Study Guide</title>
+    <!-- Google Fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind Configuration Extension for Custom Fonts and Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'], // For headings and prominent text
+                        body: ['Lora', 'serif'],           // For body text and long-form content
+                    },
+                    colors: {
+                        'bg-light': 'hsl(210, 20%, 98%)',     // Muted off-white for main background
+                        'accent-blue': 'hsl(200, 70%, 40%)',  // Sophisticated muted blue for headings and accents
+                        'text-dark': 'hsl(210, 10%, 20%)',    // Dark charcoal gray for body text
+                        'subtle-accent': 'hsl(200, 30%, 95%)', // Very light accent blue for subtle backgrounds/borders
+                        'card-bg': 'hsl(210, 15%, 99%)',      // Slightly off-white for component cards
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Custom Styles for Premium Aesthetics and Readability -->
+    <style>
+        /* Base Body and Text Styles */
+        body {
+            font-family: var(--tw-font-body);
+            background-color: var(--tw-colors-bg-light);
+            color: var(--tw-colors-text-dark);
+            line-height: 1.7; /* Increased line height for enhanced readability */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Heading Styles */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--tw-font-display);
+            color: var(--tw-colors-accent-blue);
+            font-weight: 700; /* Default heading weight */
+            line-height: 1.3;
+        }
+        h1 { font-weight: 800; } /* Extra bold for main titles */
+        strong {
+            font-weight: 600; /* Semi-bold for emphasized text in body */
+            color: var(--tw-colors-accent-blue); /* Accent color for important terms */
+        }
+        em {
+            font-style: italic;
+            color: hsl(210, 10%, 35%); /* Slightly darker italic for conceptual emphasis */
+        }
+
+        /* Container for overall layout */
+        .container {
+            max-width: 80rem; /* Expansive feel on larger screens */
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        /* Section Card Component Styling */
+        .section-card {
+            background-color: var(--tw-colors-card-bg);
+            border-radius: 1.5rem; /* Large, soft rounded corners */
+            padding: 2.5rem; /* Generous padding for content clarity */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Soft, subtle shadow */
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--tw-colors-subtle-accent); /* Delicate border */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Micro-animation for interaction */
+        }
+        .section-card:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08); /* Enhanced shadow on hover */
+        }
+
+        /* Gradient Background for Featured Sections */
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--tw-colors-subtle-accent) 0%, var(--tw-colors-bg-light) 100%);
+        }
+
+        /* Table of Contents Link Styling */
+        .toc-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--tw-colors-subtle-accent);
+            color: var(--tw-colors-accent-blue);
+            border-radius: 9999px; /* Pill shape */
+            font-family: var(--tw-font-display);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid hsl(200, 30%, 90%);
+            white-space: nowrap; /* Prevent wrapping for better visual */
+        }
+        .toc-link:hover {
+            background-color: var(--tw-colors-accent-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Practice Question (Details/Summary) Styling */
+        .practice-question summary {
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            background-color: var(--tw-colors-subtle-accent);
+            border-radius: 0.75rem;
+            font-weight: 700;
+            color: var(--tw-colors-accent-blue);
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .practice-question summary:hover {
+            background-color: hsl(200, 30%, 90%);
+            transform: translateY(-2px);
+        }
+        .practice-question summary::marker, .practice-question summary::-webkit-details-marker {
+            display: none; /* Hide default browser triangle */
+        }
+        .practice-question summary::before {
+            content: '+'; /* Custom open/close indicator */
+            font-size: 1.25em;
+            margin-right: 0.75rem;
+            transition: transform 0.2s ease-in-out;
+            color: var(--tw-colors-accent-blue);
+        }
+        .practice-question[open] summary::before {
+            content: '-';
+            transform: rotate(0deg);
+        }
+        .practice-question-answer {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid var(--tw-colors-subtle-accent);
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.02); /* Inner shadow for depth */
+        }
+
+        /* Styling for Markdown-like lists and definitions (Prose-like) */
+        .prose ul, .prose ol {
+            margin-left: 1.5em; /* Indent lists */
+            list-style-position: outside;
+        }
+        .prose ul li, .prose ol li {
+            margin-bottom: 0.5em; /* Space between list items */
+        }
+        .prose ul.list-circle li { list-style-type: circle; } /* Specific list style */
+        .prose ul.list-square li { list-style-type: square; } /* Specific list style */
+        .prose dl dt {
+            font-weight: 700;
+            margin-top: 1em;
+            margin-bottom: 0.25em;
+            color: var(--tw-colors-accent-blue);
+            font-family: var(--tw-font-display);
+            font-size: 1.125rem; /* Slightly larger for definition terms */
+        }
+        .prose dl dd {
+            margin-bottom: 0.75em;
+            padding-left: 1em;
+            border-left: 3px solid var(--tw-colors-subtle-accent); /* Visual divider for definitions */
+        }
+
+        /* Subtle scroll animations for sections */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header: Clean and minimalistic, sticky for persistent navigation -->
+    <header class="sticky top-0 z-50 bg-bg-light/90 backdrop-blur-sm shadow-sm py-4 border-b border-subtle-accent">
+        <div class="container flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-2">
+            <div class="text-xl font-display font-extrabold text-accent-blue">Academic Tutor App</div>
+            <h1 class="text-2xl md:text-3xl font-display font-extrabold text-accent-blue leading-tight tracking-tight">Wireless and Mobile Networks Study Guide</h1>
+        </div>
+    </header>
+
+    <main class="container py-12 md:py-16">
+
+        <!-- Table of Contents: Quick navigation for study guide sections -->
+        <section id="toc" class="mb-12 section-card animate-on-scroll">
+            <h2 class="text-2xl font-display font-bold mb-6 text-accent-blue">Table of Contents</h2>
+            <nav>
+                <ul class="flex flex-wrap gap-3 justify-center md:justify-start">
+                    <li><a href="#summary" class="toc-link">Summary & Definitions</a></li>
+                    <li><a href="#key-concepts" class="toc-link">Key Concepts</a></li>
+                    <li><a href="#memory-aids" class="toc-link">Memory Aids</a></li>
+                    <li><a href="#structured-guide" class="toc-link">Structured Study Guide</a></li>
+                    <li><a href="#practice-questions" class="toc-link">Practice Questions</a></li>
+                    <li><a href="#conclusion" class="toc-link">Conclusion</a></li>
+                </ul>
+            </nav>
+        </section>
+
+        <!-- Main Study Guide Title: Prominently displayed with a subtle gradient background -->
+        <section class="section-card gradient-bg text-center mb-12 animate-on-scroll">
+            <p class="text-xl md:text-2xl text-accent-blue font-display font-semibold mb-4">Mastering Modern Connectivity</p>
+            <h1 class="text-4xl md:text-5xl font-display font-extrabold text-accent-blue leading-tight tracking-tight">Wireless and Mobile Networks</h1>
+            <p class="mt-4 text-lg text-text-dark/80 max-w-3xl mx-auto">A comprehensive guide to understanding the principles, technologies, and challenges of wireless communication and mobility.</p>
+        </section>
+
+        <!-- Introduction/Summary Section: Basic overview and key definitions -->
+        <section id="summary" class="section-card animate-on-scroll">
+            <h2 class="text-3xl font-display font-bold mb-6">Summary and Basic Definitions</h2>
+            <div class="prose max-w-none">
+                <p class="mb-6">This study guide offers a comprehensive overview of <strong>Wireless and Mobile Networks</strong>, covering principles, characteristics, architecture, and management. It distinguishes between <strong>wireless communication</strong> (radio links) and <strong>mobility</strong> (changing network attachment points). Technologies discussed include <strong>CDMA</strong>, <strong>IEEE 802.11 (WiFi)</strong>, <strong>Bluetooth</strong>, and <strong>Cellular Networks (2G, 3G, 4G LTE, 5G)</strong>, alongside <strong>Mobility Management</strong> and <strong>Mobile IP</strong>.</p>
+
+                <h3 class="text-2xl font-display font-bold mb-4">Basic Definitions:</h3>
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    <div>
+                        <dt>Wireless Host</dt>
+                        <dd>Device communicating over a wireless link (e.g., laptop, smartphone), can be stationary or mobile.</dd>
+                        <dt>Base Station (BS) / Access Point (AP) / eNodeB</dt>
+                        <dd>Device connected to a wired network, relays packets between wired and wireless hosts in its coverage area.</dd>
+                        <dt>Wireless Link</dt>
+                        <dd>Communication medium using radio signals between mobile devices and base stations or other wireless nodes.</dd>
+                        <dt>Mobility</dt>
+                        <dd>Ability of a user/device to change network attachment points while maintaining ongoing connections.</dd>
+                        <dt>Handoff</dt>
+                        <dd>Process where a mobile device changes its base station connection, ideally without interrupting communication.</dd>
+                        <dt>Infrastructure Mode</dt>
+                        <dd>Wireless network where hosts connect to a wired network via a base station (AP).</dd>
+                        <dt>Ad-Hoc Mode</dt>
+                        <dd>Wireless network without base stations; nodes self-organize and route traffic among themselves.</dd>
+                        <dt>Coverage Area</dt>
+                        <dd>Geographical region with reliable wireless signal reception.</dd>
+                    </div>
+                    <div>
+                        <dt>Signal-to-Noise Ratio (SNR)</dt>
+                        <dd>Measure of signal strength relative to background noise; higher SNR aids signal extraction.</dd>
+                        <dt>Bit Error Rate (BER)</dt>
+                        <dd>Ratio of bit errors to total bits transferred; inversely related to SNR.</dd>
+                        <dt>Chipping Sequence (Code)</dt>
+                        <dd>Unique binary sequence in CDMA for encoding data, enabling simultaneous transmission with minimal interference.</dd>
+                        <dt>Home Location Register (HLR)</dt>
+                        <dd>Cellular home network database storing permanent user info and current location.</dd>
+                        <dt>Visitor Location Register (VLR)</dt>
+                        <dd>Cellular visited network database storing temporary info about users in that network.</dd>
+                        <dt>Permanent Address</dt>
+                        <dd>IP address assigned to a mobile device in its home network.</dd>
+                        <dt>Care-of-Address (COA)</dt>
+                        <dd>Temporary IP address assigned to a mobile device in a visited network.</dd>
+                        <dt>Home Agent (HA)</dt>
+                        <dd>Entity in the mobile's home network that intercepts packets for the mobile and tunnels them to its COA.</dd>
+                        <dt>Foreign Agent (FA)</dt>
+                        <dd>Entity in a visited network performing mobility functions for a mobile, receiving tunneled packets from the HA.</dd>
+                        <dt>Correspondent</dt>
+                        <dd>Node wishing to communicate with a mobile node.</dd>
+                        <dt>Tunneling</dt>
+                        <dd>Encapsulating one network protocol within another, used in Mobile IP to forward packets to a mobile's COA.</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <!-- Key Concepts Section: Detailed breakdown of core topics with a dynamic grid layout -->
+        <section id="key-concepts" class="section-card animate-on-scroll">
+            <h2 class="text-3xl font-display font-bold mb-6">Key Concepts</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 prose max-w-none">
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">Introduction to Wireless and Mobile Networks</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Wireless (mobile) phone subscribers</strong> exceed <strong>wired phone subscribers</strong> (5-to-1 ratio).</li>
+                        <li><strong>Wireless Internet-connected devices</strong> equal <strong>wired Internet-connected devices</strong>.</li>
+                        <li>Two main challenges: <strong>Wireless</strong> (communication over wireless link) and <strong>Mobility</strong> (handling users changing network attachment).</li>
+                        <li><strong>Wireless hosts</strong> (laptops, smartphones) run applications and can be stationary or mobile.</li>
+                        <li>A <strong>base station</strong> (cell tower, 802.11 AP) connects wireless hosts to the wired network.</li>
+                        <li>A <strong>wireless link</strong> connects mobiles to base stations, with varying data rates and distances.</li>
+                        <li><strong>Wireless does not always imply mobility</strong>.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3">Wireless Network Taxonomy</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Infrastructure-based (e.g., APs)</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Single-hop</strong>: Host connects directly to a base station (WiFi, WiMAX, cellular).</li>
+                                <li><strong>Multiple hops</strong>: Host relays through wireless nodes to connect to the Internet (mesh network).</li>
+                            </ul>
+                        </li>
+                        <li><strong>No Infrastructure</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Single-hop</strong>: No base station, no Internet connection (Bluetooth, ad hoc networks).</li>
+                                <li><strong>Multiple hops</strong>: No base station, may relay to other wireless nodes (Piconet, MANET, VANET).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-span-full p-6 bg-gradient-to-br from-subtle-accent to-bg-light rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">Wireless Links and Network Characteristics</h3>
+                    <ul class="list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <li><strong>Differences from wired links</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Decreased signal strength</strong>: Radio signals attenuate through matter.</li>
+                                <li><strong>Interference</strong>: Shared frequencies (e.g., 2.4 GHz) cause interference from other devices.</li>
+                                <li><strong>Multi-path propagation</strong>: Radio signals reflect off objects, arriving at the destination at different times.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Signal-to-Noise Ratio (SNR)</strong>: Higher <strong>SNR</strong> improves signal extraction.</li>
+                        <li><strong>SNR versus BER tradeoffs</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Bit Error Rate (BER)</strong>: Ratio of bit errors to total bits.</li>
+                                <li>Increasing power increases <strong>SNR</strong>, decreasing <strong>BER</strong>.</li>
+                                <li>Physical layer choice depends on <strong>SNR</strong> to meet <strong>BER</strong> requirements for throughput.</li>
+                                <li><strong>SNR</strong> can change with <strong>mobility</strong>, requiring dynamic physical layer adaptation.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Problems with multiple senders/receivers</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Hidden terminal problem</strong>: Nodes A and C cannot hear each other but interfere at node B.</li>
+                                <li><strong>Signal attenuation / Fading</strong>: Variation in signal strength.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3">Code Division Multiple Access (CDMA)</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Each user is assigned a unique <strong>code</strong> (chipping sequence).</li>
+                        <li>All users share the same frequency, using their <strong>chipping sequence</strong> to encode data.</li>
+                        <li>Allows simultaneous transmission with minimal interference if codes are <strong>orthogonal</strong>.</li>
+                        <li><strong>Encoded signal</strong> = (original data) × (chipping sequence).</li>
+                        <li><strong>Decoding</strong> = inner-product of encoded signal and chipping sequence.</li>
+                    </ul>
+                </div>
+                <div class="md:col-span-2 p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">WiFi: 802.11 Wireless LANs</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>IEEE 802.11 wireless LAN</strong> is also known as <strong>WiFi</strong>.</li>
+                        <li>Standards (e.g., 802.11b/g/n/ac/ax) use <strong>Carrier Sense Multiple Access with Collision Avoidance (CSMA/CA)</strong>.</li>
+                        <li>Supports both <strong>base-station</strong> (<strong>infrastructure</strong>) and <strong>ad-hoc</strong> modes.</li>
+                        <li><strong>802.11 LAN Architecture</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Basic Service Set (BSS)</strong> (aka "cell") in infrastructure mode: <strong>wireless hosts</strong> + <strong>Access Point (AP)</strong>.</li>
+                                <li><strong>Ad hoc mode</strong>: Hosts only.</li>
+                                <li><strong>Channels, association (Host-AP)</strong>: 802.11b uses 2.4-2.485 GHz spectrum, 11 channels. AP admin chooses frequency; interference possible. <strong>Host association</strong>: Scans channels for <strong>beacon frames</strong> (passive) or sends <strong>probe request frames</strong> (active).</li>
+                            </ul>
+                        </li>
+                        <li><strong>802.11 MAC Protocol (CSMA/CA)</strong>:
+                            <ul class="list-circle pl-5">
+                                <li>Goal: <strong>avoid collisions</strong>.</li>
+                                <li><strong>Sender</strong>: Senses channel idle for <strong>DIFS</strong>; transmits if idle. If busy, waits random <strong>backoff time</strong>. Retries if no <strong>ACK</strong> received.</li>
+                                <li><strong>Receiver</strong>: Returns <strong>ACK</strong> after <strong>SIFS</strong> (addresses hidden terminal problem).</li>
+                                <li><strong>Collision Avoidance: RTS-CTS exchange</strong>: Sender sends <strong>Request-To-Send (RTS)</strong>; AP broadcasts <strong>Clear-To-Send (CTS)</strong>. Other nodes defer transmission. Helps avoid collisions for long frames and addresses hidden terminal problem.</li>
+                            </ul>
+                        </li>
+                        <li><strong>802.11 Frame</strong>: Contains control, duration, addresses (1-4), sequence control, payload, and CRC fields.</li>
+                        <li><strong>Advanced Features in 802.11</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Rate Adaptation</strong>: APs dynamically change transmission rates based on <strong>SNR</strong> variations to maintain <strong>BER</strong>.</li>
+                                <li><strong>Power Management</strong>: Nodes can sleep and wake before <strong>beacon frames</strong>; beacons list pending AP-to-mobile frames.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3">Personal Area Networks (Bluetooth)</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Typically &lt; 10m diameter, cable replacement.</li>
+                        <li><strong>Ad hoc</strong>: No infrastructure.</li>
+                        <li>Organized into a <strong>piconet</strong> (up to 8 active devices).</li>
+                        <li><strong>Master/Slaves</strong>: Slaves request permission to send; master grants.</li>
+                        <li><strong>802.15.1</strong>: Uses 2.4-2.5 GHz band, up to 3 Mbps.</li>
+                    </ul>
+                </div>
+                <div class="col-span-full p-6 bg-gradient-to-br from-subtle-accent to-bg-light rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">Cellular Networks: 4G/5G</h3>
+                    <ul class="list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <li>Adopts <strong>Global System for Mobile (GSM)</strong> terminology.</li>
+                        <li><strong>Cell</strong>: Geographical region.</li>
+                        <li><strong>Base Station (BS)</strong>: Analogous to 802.11 AP.</li>
+                        <li><strong>Mobile users</strong> attach via BS; <strong>air-interface</strong> between mobile and BS.</li>
+                        <li><strong>Mobile Switching Center (MSC)</strong>: Connects cells to wired network, manages call setup and mobility.</li>
+                        <li><strong>2G (Voice)</strong>: GSM architecture (BTS, BSC, MSC). BSC controls multiple BTS.</li>
+                        <li><strong>3G (Voice + Data)</strong>: <strong>Universal Mobile Telecommunications Service (UMTS)</strong>. Enables Internet access; requires full TCP/IP stack. New cellular data network operates <strong>in parallel</strong> with voice network.
+                            <ul class="list-circle pl-5">
+                                <li><strong>3G Core Networks</strong>: <strong>Serving GPRS Support Node (SGSN)</strong> (delivers datagrams to/from mobile in RAN) and <strong>Gateway GPRS Support Node (GGSN)</strong> (gateway to the Internet).</li>
+                            </ul>
+                        </li>
+                        <li><strong>4G: LTE (Long-Term Evolution)</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>All IP core</strong>: IP packets tunneled through the core IP network from base station to gateway.</li>
+                                <li><strong>No separation between voice and data</strong>: All traffic over IP core.</li>
+                                <li><strong>Architecture elements</strong>: <strong>User Equipment (UE)</strong>, <strong>eNodeB</strong> (Base Station), <strong>Mobility Management Entity (MME)</strong>, <strong>Home Subscriber Server (HSS)</strong>, <strong>Serving Gateway (S-GW)</strong>, <strong>PDN Gateway (P-GW)</strong>.</li>
+                                <li><strong>Control Plane</strong>: New protocols for mobility management, security, authentication (MME, HSS).</li>
+                                <li><strong>Data Plane</strong>: Extensive <strong>tunneling</strong> (GPRS Tunneling Protocol, GTP) for mobility (S-GW, P-GW).</li>
+                                <li><strong>LTE Radio Access Network</strong>:
+                                    <ul class="list-square pl-5">
+                                        <li><strong>Downstream</strong>: <strong>OFDM</strong> (Orthogonal Frequency Division Multiplexing).</li>
+                                        <li><strong>Upstream</strong>: FDM, TDM similar to OFDM.</li>
+                                        <li>Each mobile device allocated 0.5 ms <strong>time slots</strong> over channel frequencies.</li>
+                                        <li>Achieves 100s Mbps per device.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><strong>5G Cellular Networks</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Goal</strong>: 10x peak bit rate, 10x lower latency, 100x traffic capacity over 4G.</li>
+                                <li><strong>5G NR (New Radio)</strong>: Two frequency bands (FR1: 450 MHz – 6 GHz, FR2: 24 GHz – 52 GHz, <strong>millimeter wave frequencies</strong>).</li>
+                                <li>Not backwards-compatible with 4G.</li>
+                                <li><strong>MIMO</strong>: Multiple directional antennae.</li>
+                                <li><strong>Millimeter wave frequencies (FR2)</strong>: Higher data rates, shorter distances; requires dense deployment of pico-cells.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="lg:col-span-2 p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3">4G/5G Compared to Wired Internet</h3>
+                    <ul class="list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <li><strong>Similarities</strong>: Edge/core distinction, global network of networks, widespread protocols (HTTP, TCP, IP), data/control plane separation, tunneling.</li>
+                        <li><strong>Differences</strong>: Different wireless link layer, <strong>mobility as a first-class service</strong>, user identity (SIM card), subscription-based model, "home network" vs. roaming, global access with authentication.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">Mobility Management: Principles</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Spectrum of mobility</strong>: From no mobility (within same wireless access network) to high mobility (moving between networks with ongoing connections).</li>
+                        <li><strong>Home network</strong>: Cellular provider network to which user subscribes.</li>
+                        <li><strong>Visited network</strong>: Network where mobile currently resides.</li>
+                    </ul>
+                </div>
+                <div class="col-span-full p-6 bg-gradient-to-br from-bg-light to-subtle-accent rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">Routing to a Mobile Node (Mobile IP)</h3>
+                    <ul class="list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <li><strong>Home agent</strong> performs mobility functions for remote mobile.</li>
+                        <li><strong>Care-of-address (COA)</strong>: Address in visited network.</li>
+                        <li><strong>Foreign agent</strong>: Entity in visited network performing mobility functions.</li>
+                        <li><strong>Registration</strong>: Mobile contacts foreign agent upon entering visited network; FA registers with HA, informing it of mobile's COA.</li>
+                        <li><strong>Mobile uses two addresses</strong>: <strong>permanent address</strong> (transparent to correspondent) and <strong>COA</strong> (used by HA for forwarding).</li>
+                        <li><strong>Mobility approaches</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Network (routers) handles it</strong>: Not scalable.</li>
+                                <li><strong>End-systems handle it</strong>:
+                                    <ul class="list-square pl-5">
+                                        <li>**(a) Indirect Routing**: Correspondent addresses packets to mobile's <strong>permanent address</strong>. <strong>Home agent</strong> intercepts and <strong>tunnels</strong> packets to <strong>foreign agent</strong>'s COA. FA decapsulates and forwards to mobile. Mobile replies directly to correspondent.</li>
+                                        <li>**(b) Direct Routing**: Correspondent gets mobile's <strong>care-of-address</strong> from <strong>home agent</strong> and sends packets directly. Overcomes <strong>triangle routing problem</strong> but is non-transparent to correspondent.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><strong>Mobile IP Standard (RFC 5944 for IPv4)</strong>: Indirect Routing, Agent Discovery, Registration with Home Agent.</li>
+                        <li><strong>Agent Discovery</strong>: HAs/FAs advertise service via ICMP messages with <strong>H,F bits</strong> (home/foreign agent) and <strong>R bit</strong> (registration required).</li>
+                        <li><strong>Encapsulation and Decapsulation</strong>: Packets are sent within another packet (tunneling) to reach the mobile's COA.</li>
+                    </ul>
+                </div>
+                <div class="lg:col-span-2 p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3">Handling Mobility in Cellular Networks (GSM)</h3>
+                    <ul class="list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <li><strong>HLR (Home Location Register)</strong>: Home network database with permanent phone #, profile, and current location.</li>
+                        <li><strong>VLR (Visitor Location Register)</strong>: Visited network database with entry for each user currently in that network.</li>
+                        <li><strong>Indirect Routing to Mobile (GSM)</strong>:
+                            <ol class="list-decimal pl-5">
+                                <li>Call routed to home network.</li>
+                                <li>Home MSC consults HLR for mobile's roaming number (in visited network).</li>
+                                <li>Home MSC sets up second leg to visited network's MSC.</li>
+                                <li>Visited MSC completes call via base station to mobile.</li>
+                            </ol>
+                        </li>
+                        <li><strong>GSM Handoff with common MSC</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Goal</strong>: Route call via new base station without interruption.</li>
+                                <li>Initiated by old BS (due to <strong>stronger signal</strong> from new BS or <strong>load balancing</strong>).</li>
+                                <li><strong>Mechanism</strong>: Old BS informs MSC; MSC sets up path to new BS; new BS allocates channel; new BS signals readiness; old BS tells mobile to handoff; mobile and new BS activate channel; mobile signals handoff complete; MSC reroutes call; old BS resources released.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3">Wireless and Mobility: Impact on Higher-Layer Protocols</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Logically minimal impact</strong>: Best-effort service model, TCP/UDP can run over wireless.</li>
+                        <li><strong>Performance-wise</strong>:
+                            <ul class="list-circle pl-5">
+                                <li><strong>Packet loss/delay</strong> due to bit errors, link-layer retransmissions, and handoff.</li>
+                                <li><strong>TCP misinterprets loss as congestion</strong>, causing unnecessary congestion window decrease.</li>
+                                <li>Delay impairments for real-time traffic.</li>
+                                <li>Limited bandwidth of wireless links.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory Aids Section: Mnemonics and analogies to help recall concepts -->
+        <section id="memory-aids" class="section-card animate-on-scroll">
+            <h2 class="text-3xl font-display font-bold mb-6">Memory Aids</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 prose max-w-none">
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">CDMA (Code Division Multiple Access)</h3>
+                    <p class="italic text-gray-700 mb-2">Imagine a party where everyone speaks at once, but each uses a unique "code language." Only those knowing the code understand each other.</p>
+                    <ul class="list-disc pl-5">
+                        <li><strong>Encoding</strong>: <em>Data bit</em> × <em>Chipping Sequence</em>.</li>
+                        <li><strong>Decoding</strong>: <em>Received Signal</em> • <em>Chipping Sequence</em>.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance)</h3>
+                    <p class="italic text-gray-700 mb-2">"Listen before you talk, and if you think someone else might talk simultaneously, politely wait, then confirm your message was heard." (Contrast with CSMA/CD where collisions are detected and transmission stops).</p>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">Mobile IP Roles (Home, Foreign, Care-of-Address)</h3>
+                    <ul class="list-disc pl-5">
+                        <li><strong>HA</strong>: "Home Base" – knows where you <em>should</em> be and intercepts mail.</li>
+                        <li><strong>FA</strong>: "Friendly Agent" – temporary host in a foreign land helping with mail.</li>
+                        <li><strong>COA</strong>: "Current Operating Address" – your temporary forwarding address.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">GSM Handoff</h3>
+                    <p class="italic text-gray-700 mb-2">Like a relay race. The "old base station" hands off the "baton" (connection) to the "new base station" mid-run, so the "runner" (mobile) doesn't stop. Reasons: "Better connection, less crowded track."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Structured Study Guide Section: Organized sub-sections for deep dive -->
+        <section id="structured-guide" class="section-card animate-on-scroll">
+            <h2 class="text-3xl font-display font-bold mb-6">Structured Study Guide Section</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 prose max-w-none">
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">What to Remember</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li><strong>Fundamental Differences</strong>: Understand wireless link characteristics vs. wired (signal attenuation, interference, multi-path propagation).</li>
+                        <li><strong>CDMA Mechanics</strong>: Grasp unique chipping sequences for encoding/decoding, enabling simultaneous transmissions.</li>
+                        <li><strong>WiFi (802.11) Protocol</strong>: Remember <strong>CSMA/CA</strong> (MAC) and <strong>RTS/CTS</strong> for collision avoidance (hidden terminal problem). Differentiate infrastructure vs. ad-hoc modes and scanning methods.</li>
+                        <li><strong>Cellular Network Evolution</strong>: Recall 2G (voice), 3G (voice + data, parallel networks), 4G LTE (all-IP core, tunneling), and 5G goals/features (millimeter wave, MIMO).</li>
+                        <li><strong>Mobile IP</strong>: Key entities (<strong>Home Agent, Foreign Agent, Correspondent</strong>) and addresses (<strong>Permanent Address, Care-of-Address</strong>). Understand indirect vs. direct routing and the registration process.</li>
+                        <li><strong>Cellular Mobility</strong>: Recognize <strong>HLR</strong> and <strong>VLR</strong> roles in GSM for location management and how handoffs maintain call continuity.</li>
+                        <li><strong>Impact on Higher Layers</strong>: Wireless is logically transparent, but performance issues (packet loss, TCP misinterpreting loss as congestion) are significant.</li>
+                    </ol>
+                </div>
+                <div class="md:col-span-2 p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">How Concepts Work</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Signal Attenuation & BER/SNR</strong>: Signal strength diminishes with distance. Noise corrupts bits. Higher SNR means less BER. Networks dynamically adjust transmission rates (modulation) based on SNR to maintain BER and maximize throughput.</li>
+                        <li><strong>Hidden Terminal Problem</strong>: Nodes A and C can't hear each other but both transmit to B. Their transmissions collide at B. CSMA/CA with RTS/CTS resolves this: A sends RTS to B; B broadcasts CTS, silencing C. A then sends data.</li>
+                        <li><strong>CDMA Encoding/Decoding</strong>: Data bit (0 or 1) multiplied by a chipping sequence spreads the signal. Receiver multiplies incoming signal (sum of spread signals) by intended receiver's chipping sequence. Orthogonal codes recover intended signal, others appear as noise.</li>
+                        <li><strong>CSMA/CA (WiFi)</strong>: Node senses channel. If idle for DIFS, transmits. If busy, waits random backoff. Expects ACK; no ACK triggers retransmission with increased backoff. RTS/CTS reserves channel for long frames.</li>
+                        <li><strong>Mobile IP Routing</strong>: Correspondent sends to mobile's permanent address. <strong>Home Agent (HA)</strong> intercepts. In indirect routing, HA tunnels packet to mobile's <strong>Care-of-Address (COA)</strong> (via <strong>Foreign Agent (FA)</strong>). FA decapsulates and forwards. Mobile replies directly. Direct routing has correspondent send directly to COA after discovery.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">Common Student Mistakes</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Confusing "Wireless" with "Mobility"</strong>: Wireless is the medium; mobility is movement while connected.</li>
+                        <li><strong>Misunderstanding CSMA/CD vs. CSMA/CA</strong>: Ethernet uses Collision Detection (CD); wireless uses Collision Avoidance (CA) due to transmission difficulties.</li>
+                        <li><strong>TCP over Wireless Misinterpretation</strong>: TCP interprets wireless packet loss (bit errors) as congestion, unnecessarily reducing congestion window and impacting performance.</li>
+                        <li><strong>Incorrect CDMA Calculation</strong>: Forgetting to normalize the inner product result by the chipping sequence length during decoding.</li>
+                        <li><strong>Confusing HA and FA roles</strong>: Mixing up which agent is in the home vs. visited network and their specific functions.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-subtle-accent/50">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">Effective Study Tips</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Diagram Tracing</strong>: Draw and trace data/control flow for CDMA, Mobile IP, and GSM handoff to visualize interactions.</li>
+                        <li><strong>Comparative Tables</strong>: Create tables comparing wireless technologies (WiFi vs. Bluetooth vs. Cellular, 2G vs. 3G vs. 4G vs. 5G) by characteristics and use cases.</li>
+                        <li><strong>Numerical Examples (CDMA)</strong>: Practice encoding/decoding with data bits and chipping sequences to reinforce mathematical understanding.</li>
+                        <li><strong>Real-World Analogies</strong>: Use analogies (mail forwarding for Mobile IP, unique languages for CDMA) to solidify understanding.</li>
+                        <li><strong>Focus on "Why"</strong>: Understand the reasons behind protocols (e.g., why CSMA/CA for wireless? why RTS/CTS? why tunneling?).</li>
+                        <li><strong>Review Roadmap</strong>: Use provided roadmap (7.1, 7.2, etc.) for systematic topic coverage.</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-subtle-accent/70 rounded-xl border border-subtle-accent/90">
+                    <h3 class="text-xl font-display font-semibold mb-3 text-accent-blue">Real-World Applications</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>WiFi (802.11)</strong>: Ubiquitous for Internet access in homes, offices, public spaces. Essential for laptops, smartphones, smart home devices, IoT.</li>
+                        <li><strong>Bluetooth</strong>: Short-range personal area networks for wireless headphones, keyboards, mice, smartwatches, car systems.</li>
+                        <li><strong>Cellular Networks (4G/5G)</strong>: Backbone of mobile communication.
+                            <ul class="list-circle pl-5">
+                                <li><strong>4G LTE</strong>: Powers smartphones for high-speed mobile internet, streaming, VoLTE.</li>
+                                <li><strong>5G</strong>: Ultra-fast speeds, low latency, massive connectivity for autonomous vehicles, smart cities, AR/VR, advanced IoT.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Mobile IP</strong>: Principles of <strong>Home Agents</strong> and <strong>Care-of-Addresses</strong> are fundamental to IP-based mobility, though specific cellular protocols are more common in daily use.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Questions & Answers: Interactive section for self-assessment -->
+        <section id="practice-questions" class="section-card animate-on-scroll">
+            <h2 class="text-3xl font-display font-bold mb-6">Practice Questions & Answers</h2>
+            <div class="space-y-6 prose max-w-none">
+                <!-- Question 1 -->
+                <details class="practice-question">
+                    <summary>Question 1 (CDMA)</summary>
+                    <div class="practice-question-answer">
+                        <p class="font-semibold mb-2">Consider a CDMA system where sender A wants to send data bit '0' and sender B wants to send data bit '1'.</p>
+                        <ul class="list-disc pl-5 mb-4">
+                            <li>Sender A's chipping sequence: (1, 1, -1, -1)</li>
+                            <li>Sender B's chipping sequence: (1, -1, 1, -1)</li>
+                        </ul>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>What is the encoded signal of sender A and sender B before they are added to the channel?</li>
+                            <li>What is the combined signal on the channel after both encoded signals are added?</li>
+                            <li>If a receiver wants to decode sender A's original data, what would be the decoded output? Show your working.</li>
+                        </ol>
+                        <h4 class="text-xl font-display font-bold mt-6 mb-2 text-accent-blue">Model Answer 1:</h4>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li><strong>Encoded signal of sender A and sender B:</strong>
+                                <ul class="list-disc pl-5">
+                                    <li>Data bit '0' is represented as -1.</li>
+                                    <li>Data bit '1' is represented as 1.</li>
+                                </ul>
+                                <p><strong>Sender A (data bit '0' = -1):</strong><br>
+                                Encoded signal A = -1 × (1, 1, -1, -1) = (-1, -1, 1, 1)</p>
+                                <p><strong>Sender B (data bit '1' = 1):</strong><br>
+                                Encoded signal B = 1 × (1, -1, 1, -1) = (1, -1, 1, -1)</p>
+                            </li>
+                            <li><strong>Combined signal on the channel:</strong>
+                                <p>Combined signal = Encoded signal A + Encoded signal B<br>
+                                Combined signal = (-1, -1, 1, 1) + (1, -1, 1, -1) = (0, -2, 2, 0)</p>
+                            </li>
+                            <li><strong>Decoding sender A's original data:</strong>
+                                <p>Decoded output for A = (Combined signal • Sender A's chipping sequence) / Length of sequence<br>
+                                Decoded output for A = ( (0×1) + (-2×1) + (2×-1) + (0×-1) ) / 4<br>
+                                Decoded output for A = (0 - 2 - 2 + 0) / 4 = -4 / 4 = -1</p>
+                                <p>Since -1 represents data bit '0', sender A's original data bit is '0'.</p>
+                            </li>
+                        </ol>
+                    </div>
+                </details>
+
+                <!-- Question 2 -->
+                <details class="practice-question">
+                    <summary>Question 2 (WiFi & Mobility)</summary>
+                    <div class="practice-question-answer">
+                        <p class="font-semibold mb-2">A user is moving through a large office building with multiple WiFi access points (APs) and maintains an active video call.</p>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>Explain the process of how the user's device initially connects to an AP. Describe both passive and active scanning methods.</li>
+                            <li>How does the WiFi (802.11) MAC protocol aim to avoid collisions in this environment, and what specific mechanism helps with the "hidden terminal problem"?</li>
+                            <li>As the user moves from one AP's coverage to another, how does the network manage this "handoff" to ensure the video call continues without interruption within the same IP subnet?</li>
+                        </ol>
+                        <h4 class="text-xl font-display font-bold mt-6 mb-2 text-accent-blue">Model Answer 2:</h4>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li><strong>Initial connection to an AP (Scanning methods):</strong>
+                                <ul class="list-disc pl-5">
+                                    <li><strong>Passive Scanning</strong>: Host listens for <strong>beacon frames</strong> from APs, which contain network info (SSID, MAC, rates). Host selects an AP, sends <strong>Association Request</strong>, receives <strong>Association Response</strong>.</li>
+                                    <li><strong>Active Scanning</strong>: Host broadcasts <strong>Probe Request frames</strong>. APs respond with <strong>Probe Response frames</strong>. Host selects AP, sends <strong>Association Request</strong>, receives <strong>Association Response</strong>. Active scanning is often faster.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Collision avoidance and the "hidden terminal problem" in 802.11:</strong>
+                                <ul class="list-disc pl-5">
+                                    <li><strong>CSMA/CA</strong>: Node senses channel. If idle for DIFS, transmits. If busy, waits random backoff. Expects ACK; no ACK triggers retransmission.</li>
+                                    <li><strong>Hidden Terminal Problem</strong>: Nodes A and C can't hear each other but transmit to AP B, causing collision at B.</li>
+                                    <li><strong>RTS/CTS exchange</strong>: Sender A sends <strong>RTS</strong> to AP B. AP B broadcasts <strong>CTS</strong>. Nodes like C hear CTS and defer transmission. A then sends data. This reserves the channel and avoids collisions.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Handoff management within the same IP subnet:</strong>
+                                <ul class="list-disc pl-5">
+                                    <li><strong>Association/Reassociation</strong>: Device detects stronger signal from new AP and reassociates.</li>
+                                    <li><strong>Self-learning Switches</strong>: Ethernet switches update forwarding tables to direct traffic to the new switch port where the device (by MAC address) is now reachable.</li>
+                                    <li><strong>Seamless Connectivity</strong>: IP address remains constant, routing tables adapt quickly, maintaining ongoing connections like video calls without interruption.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- Conclusion: Final summary of the study guide -->
+        <section id="conclusion" class="section-card animate-on-scroll">
+            <h2 class="text-3xl font-display font-bold mb-6">Conclusion</h2>
+            <div class="prose max-w-none">
+                <p>This study guide has covered the fundamentals of wireless and mobile networks, contrasting them with wired communication and addressing the complexities of user mobility. We examined <strong>CDMA</strong>, <strong>WiFi (802.11) CSMA/CA</strong> with <strong>RTS/CTS</strong>, and the evolution of <strong>cellular networks</strong> (2G to 5G) with technologies like <strong>millimeter wave frequencies</strong> and <strong>MIMO</strong>. Principles of <strong>Mobility Management</strong> and <strong>Mobile IP</strong>, including <strong>Home Agents</strong>, <strong>Foreign Agents</strong>, and <strong>Care-of-Addresses</strong>, were detailed. The impact of wireless links on <strong>higher-layer protocols</strong> like TCP was discussed, highlighting performance degradation. Understanding these concepts is vital for developing future communication systems.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // JavaScript for Smooth Scrolling within Table of Contents
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // JavaScript for Scroll-Triggered Fade-In Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                } else {
+                    // Optional: remove 'is-visible' class if element scrolls out of view
+                    // entry.target.classList.remove('is-visible');
+                }
+            });
+        }, {
+            threshold: 0.1 // Trigger when 10% of the element is visible
+        });
+
+        // Observe all elements with the 'animate-on-scroll' class
+        document.querySelectorAll('.animate-on-scroll').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

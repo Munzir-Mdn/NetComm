@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Link Layer: Network Communication Foundations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Tailwind Configuration */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem; /* Tailwind's rounded-xl */
+        }
+        .code-block {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #39FF14; /* Neon green accent */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'JetBrains Mono', monospace; /* Fallback for monospace */
+            color: #E0E7FF; /* text-light */
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+        }
+        .gradient-bg {
+            background: radial-gradient(at 20% 50%, hsla(240, 60%, 15%, 1) 0px, transparent 50%),
+                        radial-gradient(at 80% 80%, hsla(290, 60%, 15%, 1) 0px, transparent 50%),
+                        radial-gradient(at 0% 0%, hsla(200, 70%, 10%, 1) 0px, transparent 50%),
+                        linear-gradient(135deg, hsla(220, 80%, 8%, 1) 0%, hsla(260, 80%, 10%, 1) 100%);
+        }
+
+        /* Custom scrollbar for a sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1A162F; /* Dark background */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4A5568; /* Greyish thumb */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280; /* Lighter on hover */
+        }
+        /* Specific scrollbar for code blocks */
+        .code-block::-webkit-scrollbar {
+            height: 6px;
+        }
+        .code-block::-webkit-scrollbar-thumb {
+            background: #6D28D9; /* Accent color */
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'dark-primary': '#0D0A1F', /* Deep purplish-dark */
+                        'dark-secondary': '#1A162F', /* Slightly lighter dark */
+                        'accent-1': '#8A2BE2', /* Blue Violet */
+                        'accent-2': '#00BFFF', /* Deep Sky Blue */
+                        'text-light': '#E0E7FF', /* Light blue-white */
+                        'text-muted': '#A7B7E9', /* Muted blue-grey */
+                        'neon-green': '#39FF14', /* Bright neon green */
+                        'electric-blue': '#00FFFF', /* Electric blue */
+                        'glass-border': 'rgba(255, 255, 255, 0.1)',
+                        'glass-bg': 'rgba(255, 255, 255, 0.08)',
+                    },
+                    keyframes: {
+                        'fade-in-up': {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        'fade-in': {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+                        'fade-in': 'fade-in 0.8s ease-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-primary text-text-light font-inter min-h-screen gradient-bg selection:bg-accent-1 selection:text-white">
+
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+
+        <!-- Header/Title Section -->
+        <header class="text-center mb-16 animate-fade-in-up">
+            <h1 class="text-5xl md:text-7xl font-outfit font-bold mb-4 bg-gradient-to-r from-accent-1 to-electric-blue text-transparent bg-clip-text leading-tight">
+                The Link Layer
+            </h1>
+            <p class="text-2xl md:text-3xl text-text-muted font-light">Foundations of Network Communication</p>
+            <div class="mt-8 border-t-2 border-accent-1 opacity-20 w-24 mx-auto"></div>
+        </header>
+
+        <!-- Summary Section -->
+        <section class="mb-16 animate-fade-in-up delay-100">
+            <h2 class="text-4xl font-outfit font-semibold text-accent-2 mb-8">Summary and Basic Definitions</h2>
+            <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005]">
+                <p class="text-lg leading-relaxed mb-6 text-text-muted">
+                    The Link Layer (Layer 2 of the OSI model) ensures reliable data transfer between physically adjacent network nodes. It encapsulates network-layer datagrams into frames, handling local data delivery, error detection/correction, multiple access protocols, and addressing within a local network segment. This guide explores its principles, services, and technologies, including applications in data center networking and web request processing.
+                </p>
+
+                <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Basic Definitions</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="p-5 bg-dark-secondary rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 hover:translate-y-[-2px]">
+                        <p class="font-semibold text-electric-blue">Host:</p>
+                        <p class="text-text-muted">An end-system device (e.g., computer, smartphone) on a network.</p>
+                    </div>
+                    <div class="p-5 bg-dark-secondary rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 hover:translate-y-[-2px]">
+                        <p class="font-semibold text-electric-blue">Router:</p>
+                        <p class="text-text-muted">A network device that forwards data packets between networks, operating at Layer 3.</p>
+                    </div>
+                    <div class="p-5 bg-dark-secondary rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 hover:translate-y-[-2px]">
+                        <p class="font-semibold text-electric-blue">Communication Channels (Links):</p>
+                        <p class="text-text-muted">Physical pathways connecting adjacent nodes (wired, wireless, LANs).</p>
+                    </div>
+                    <div class="p-5 bg-dark-secondary rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 hover:translate-y-[-2px]">
+                        <p class="font-semibold text-electric-blue">Layer-2 Packet (Frame):</p>
+                        <p class="text-text-muted">Data unit at the link layer, encapsulating a network-layer datagram.</p>
+                    </div>
+                    <div class="p-5 bg-dark-secondary rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 hover:translate-y-[-2px]">
+                        <p class="font-semibold text-electric-blue">Data-link Layer Responsibility:</p>
+                        <p class="text-text-muted">Transferring a frame from one node to a physically adjacent node over a link.</p>
+                    </div>
+                    <div class="p-5 bg-dark-secondary rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 hover:translate-y-[-2px]">
+                        <p class="font-semibold text-electric-blue">Link Layer Adapter (NIC):</p>
+                        <p class="text-text-muted">Hardware implementing the link and physical layers (e.g., Ethernet card).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Concepts Section -->
+        <section class="mb-16 animate-fade-in-up delay-200">
+            <h2 class="text-4xl font-outfit font-semibold text-accent-2 mb-8">Key Concepts</h2>
+
+            <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Link Layer Services Card -->
+                <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005] col-span-full">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Link Layer Services</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li>
+                            <strong class="text-electric-blue">Error Detection and Correction:</strong> Mechanisms to identify and potentially fix corrupted bits.
+                            <ul class="list-disc pl-6 mt-2 space-y-2">
+                                <li><strong class="text-neon-green">Flow Control:</strong> Pacing between adjacent sending/receiving nodes.</li>
+                                <li><strong class="text-neon-green">Error Detection:</strong> Receiver detects errors, may request retransmission or drop.</li>
+                                <li><strong class="text-neon-green">Error Correction:</strong> Receiver identifies and corrects bit errors.</li>
+                                <li><strong class="text-neon-green">Half-duplex / Full-duplex:</strong> Bidirectional, but not simultaneously / simultaneous bidirectional transmission.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong class="text-electric-blue">Sharing a Broadcast Channel:</strong> Multiple Access Protocols govern sharing.
+                        </li>
+                        <li>
+                            <strong class="text-electric-blue">Link Layer Addressing:</strong> Using MAC addresses for local identification.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Error Detection and Correction Techniques Card -->
+                <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005]">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Error Detection and Correction Techniques</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">Single Bit Parity:</strong> Detects single bit errors.</li>
+                        <li><strong class="text-electric-blue">Two-dimensional Bit Parity:</strong> Detects and corrects single bit errors.</li>
+                        <li><strong class="text-electric-blue">Cyclic Redundancy Checks (CRC):</strong> Powerful, detects burst errors (Ethernet, 802.11).</li>
+                        <li><strong class="text-electric-blue">Internet Checksum:</strong> (Transport layer) Detects "flipped bits".</li>
+                    </ul>
+                </div>
+
+                <!-- Multiple Access Protocols Categories Card -->
+                <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005] md:col-span-1 lg:col-span-2">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Multiple Access Protocols Categories</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="font-semibold text-electric-blue mb-2">Channel Partitioning Protocols:</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li><strong class="text-neon-green">TDMA:</strong> Fixed-length time slots.</li>
+                                <li><strong class="text-neon-green">FDMA:</strong> Channel spectrum divided into frequency bands.</li>
+                                <li><strong class="text-neon-green">CDMA:</strong> Unique code for each node, allowing simultaneous transmission.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-electric-blue mb-2">Random Access Protocols:</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li><strong class="text-neon-green">Slotted ALOHA / Pure ALOHA:</strong> Transmit at slot start / transmit immediately; retransmit on collision.</li>
+                                <li><strong class="text-neon-green">CSMA:</strong> "Listen before transmit."</li>
+                                <li><strong class="text-neon-green">CSMA/CD:</strong> (Wired LANs) Detect collisions, abort, backoff, retransmit.</li>
+                                <li><strong class="text-neon-green">CSMA/CA:</strong> (802.11 wireless) Collision avoidance.</li>
+                            </ul>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="font-semibold text-electric-blue mb-2">Taking Turns Protocols:</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li><strong class="text-neon-green">Polling:</strong> Master invites slave nodes.</li>
+                                <li><strong class="text-neon-green">Token Passing:</strong> Token grants transmission rights.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Local Area Networks (LANs) Card -->
+                <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005] col-span-full">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Local Area Networks (LANs)</h3>
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div>
+                            <p class="font-semibold text-electric-blue mb-2">Link Layer Addressing (MAC Addresses):</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li><strong class="text-neon-green">MAC Address:</strong> 48-bit physical address, burned into NIC ROM, for local frame transfer.</li>
+                                <li><strong class="text-neon-green">OUI:</strong> First 3 bytes (manufacturer).</li>
+                                <li><strong class="text-neon-green">Vendor Assigned:</strong> Last 3 bytes.</li>
+                                <li><strong class="text-neon-green">MAC Address Portability:</strong> Flat address, portable.</li>
+                                <li><strong class="text-neon-green">IP Address:</strong> Hierarchical, network-wide, not portable.</li>
+                            </ul>
+                            <p class="font-semibold text-electric-blue mt-4 mb-2">Address Resolution Protocol (ARP):</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li>Determines <strong class="text-neon-green">MAC address</strong> given its <strong class="text-neon-green">IP address</strong>.</li>
+                                <li><strong class="text-neon-green">ARP table:</strong> IP-to-MAC mapping with TTL.</li>
+                                <li><strong class="text-neon-green">ARP Query:</strong> Broadcasts request.</li>
+                                <li><strong class="text-neon-green">ARP Reply:</strong> Target responds with MAC.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-electric-blue mb-2">Ethernet:</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li>Dominant wired LAN (IEEE 802.3 CSMA/CD).</li>
+                                <li><strong class="text-neon-green">Connectionless, Unreliable:</strong> Higher layers recover dropped data.</li>
+                                <li><strong class="text-neon-green">Frame Structure:</strong> Preamble, Dest/Source MAC, Type, Data, CRC.</li>
+                                <li><strong class="text-neon-green">Physical Topology:</strong> Now predominantly <strong class="text-neon-green">switched</strong> (separate collision domain per link).</li>
+                            </ul>
+                            <p class="font-semibold text-electric-blue mt-4 mb-2">Link-Layer Switches:</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li>Active role: <strong class="text-neon-green">store-and-forward</strong> Ethernet frames.</li>
+                                <li><strong class="text-neon-green">Transparent, Plug-and-play, Self-learning:</strong> Build <strong class="text-neon-green">forwarding table</strong>.</li>
+                                <li><strong class="text-neon-green">Filtering:</strong> Drops frames if destination on same segment.</li>
+                                <li><strong class="text-neon-green">Forwarding:</strong> Sends to specific output interface.</li>
+                                <li><strong class="text-neon-green">Flooding:</strong> If unknown, forwards on all interfaces except arrival.</li>
+                                <li>Supports <strong class="text-neon-green">multiple simultaneous transmissions</strong>.</li>
+                            </ul>
+                            <p class="font-semibold text-electric-blue mt-4 mb-2">Virtual Local Area Networks (VLANs):</p>
+                            <ul class="list-disc pl-5 space-y-2 text-text-muted">
+                                <li>Define multiple <strong class="text-neon-green">virtual LANs</strong> over single physical infra.</li>
+                                <li><strong class="text-neon-green">Port-based, Traffic Isolation, Dynamic Membership.</strong></li>
+                                <li><strong class="text-neon-green">802.1Q protocol:</strong> Uses <strong class="text-neon-green">trunk links</strong> to carry VLAN ID.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Center Networking Card -->
+                <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005]">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Data Center Networking</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li>Hundreds of thousands of hosts.</li>
+                        <li><strong class="text-electric-blue">Challenges:</strong> Massive clients, load management, bottleneck avoidance.</li>
+                        <li><strong class="text-electric-blue">Hierarchical Topology:</strong> Border router -> Load balancer -> Access router -> Tier-1/2 switches -> TOR switches -> Server racks.</li>
+                        <li><strong class="text-electric-blue">Trends:</strong> Rich interconnection for throughput and redundancy.</li>
+                    </ul>
+                </div>
+
+                <!-- A Day in the Life of a Web Request (Synthesis) Card -->
+                <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005] md:col-span-1 lg:col-span-2">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">A Day in the Life of a Web Request (Synthesis)</h3>
+                    <ol class="list-decimal pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">DHCP:</strong> Laptop connects, gets IP, router IP, DNS server IP (broadcast request).</li>
+                        <li><strong class="text-electric-blue">ARP:</strong> Client needs MAC of first-hop router (ARP query broadcast, router replies).</li>
+                        <li><strong class="text-electric-blue">DNS:</strong> Client queries DNS server to resolve <code class="text-neon-green">www.google.com</code> to an IP.</li>
+                        <li><strong class="text-electric-blue">TCP Connection:</strong> Client opens TCP socket to web server (3-way handshake).</li>
+                        <li><strong class="text-electric-blue">HTTP Request/Response:</strong> HTTP request sent over TCP, routed to web server; server responds, routed back.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory Aids Section -->
+        <section class="mb-16 animate-fade-in-up delay-300">
+            <h2 class="text-4xl font-outfit font-semibold text-accent-2 mb-8">Memory Aids</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-card p-6 hover:scale-[1.01] transition-transform duration-200">
+                    <p class="font-semibold text-electric-blue mb-2">CRC Calculation Steps (DRGR):</p>
+                    <ul class="list-disc pl-5 text-text-muted">
+                        <li><strong class="text-neon-green">D</strong>ata bits</li>
+                        <li>Append <code class="text-neon-green">r</code> zeros</li>
+                        <li>Agree on <strong class="text-neon-green">G</strong>enerator polynomial (G)</li>
+                        <li>Divide (modulo 2) to get <strong class="text-neon-green">R</strong>emainder</li>
+                        <li>Transmit <code class="text-neon-green">D</code> followed by <code class="text-neon-green">R</code></li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 hover:scale-[1.01] transition-transform duration-200">
+                    <p class="font-semibold text-electric-blue mb-2">MAC Address vs. IP Address:</p>
+                    <ul class="list-disc pl-5 text-text-muted">
+                        <li><strong class="text-neon-green">MAC:</strong> Social Security Number – unique, flat, burned-in, local.</li>
+                        <li><strong class="text-neon-green">IP:</strong> Postal Address – hierarchical, network-wide, not portable.</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 hover:scale-[1.01] transition-transform duration-200">
+                    <p class="font-semibold text-electric-blue mb-2">MAC Protocol Categories (CRaT):</p>
+                    <ul class="list-disc pl-5 text-text-muted">
+                        <li><strong class="text-neon-green">C</strong>hannel Partitioning</li>
+                        <li><strong class="text-neon-green">Ra</strong>ndom Access</li>
+                        <li><strong class="text-neon-green">T</strong>aking Turns</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 hover:scale-[1.01] transition-transform duration-200">
+                    <p class="font-semibold text-electric-blue mb-2">CSMA/CD Analogy:</p>
+                    <p class="text-text-muted">"The Polite Conversationalist" – listen before speaking, if others speak simultaneously, stop and wait before trying again.</p>
+                </div>
+                <div class="glass-card p-6 hover:scale-[1.01] transition-transform duration-200 md:col-span-2">
+                    <p class="font-semibold text-electric-blue mb-2">Switch Learning:</p>
+                    <ul class="list-disc pl-5 text-text-muted">
+                        <li><strong class="text-neon-green">Source = Learn:</strong> Record source MAC and port.</li>
+                        <li><strong class="text-neon-green">Destination = Forward/Flood:</strong> Look up dest MAC; if found, forward; if not, flood.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Structured Study Guide Section -->
+        <section class="mb-16 animate-fade-in-up delay-400">
+            <h2 class="text-4xl font-outfit font-semibold text-accent-2 mb-8">Structured Study Guide</h2>
+            <div class="space-y-10">
+                <!-- What to Remember -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">What to Remember</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li>The Link Layer's role in local, hop-by-hop data transfer.</li>
+                        <li>Error detection vs. correction mechanisms (parity, CRC).</li>
+                        <li>Necessity and types of multiple access protocols for shared media.</li>
+                        <li>Distinction and relationship between MAC and IP addresses, and ARP's role.</li>
+                        <li>Ethernet characteristics: frame structure, connectionless/unreliable, CSMA/CD.</li>
+                        <li>Link-layer switches: forwarding table building (self-learning), filtering/forwarding.</li>
+                        <li>VLANs: purpose, benefits (isolation, dynamic membership), and 802.1Q protocol.</li>
+                        <li>The step-by-step process of a network request (e.g., web request) from application to link layer and back.</li>
+                    </ul>
+                </div>
+
+                <!-- How Concepts Work -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">How Concepts Work</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">Error Detection:</strong> Sender appends redundant bits. Receiver compares calculated bits with received ones.</li>
+                        <li><strong class="text-electric-blue">Multiple Access Protocols:</strong> Dictate transmission on shared medium. Channel partitioning pre-allocates; Random Access allows contention; Taking Turns ensures orderly access.</li>
+                        <li><strong class="text-electric-blue">MAC Addressing:</strong> Unique hardware IDs for local frame delivery by switches.</li>
+                        <li><strong class="text-electric-blue">ARP Operation:</strong> Broadcasts query for local MAC given IP; target replies. Mappings cached.</li>
+                        <li><strong class="text-electric-blue">Switch Learning and Forwarding:</strong> Switches learn MACs from source addresses. Forward by looking up destination MAC; flood if unknown.</li>
+                        <li><strong class="text-electric-blue">VLANs:</strong> Logically segment a physical network for isolation. 802.1Q tags frames on trunk links.</li>
+                    </ul>
+                </div>
+
+                <!-- Common Student Mistakes -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Common Student Mistakes</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">Confusing IP and MAC Addresses:</strong> IP is logical/hierarchical/network-layer; MAC is physical/flat/link-layer.</li>
+                        <li><strong class="text-electric-blue">Misunderstanding Collision Domains:</strong> Hubs = one large; Switches = separate per port.</li>
+                        <li><strong class="text-electric-blue">Incorrect CRC Calculations:</strong> Careful modulo 2 division.</li>
+                        <li><strong class="text-electric-blue">Overlooking Ethernet's Unreliability/Connectionlessness:</strong> Higher layers (TCP) handle reliability.</li>
+                        <li><strong class="text-electric-blue">Not knowing when to use ARP:</strong> For *local* device MAC addresses when IP is known.</li>
+                    </ul>
+                </div>
+
+                <!-- Effective Study Tips -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Effective Study Tips</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">Draw Diagrams:</strong> Visualize protocols, frame paths.</li>
+                        <li><strong class="text-electric-blue">Practice CRC Calculations:</strong> Manually work through examples.</li>
+                        <li><strong class="text-electric-blue">Compare and Contrast:</strong> Use tables for protocols, hubs vs. switches, IP vs. MAC.</li>
+                        <li><strong class="text-electric-blue">Trace Web Requests:</strong> Understand step-by-step (DHCP -> ARP -> DNS -> TCP -> HTTP).</li>
+                        <li><strong class="text-electric-blue">Review Frame Structures:</strong> Memorize Ethernet frame fields.</li>
+                    </ul>
+                </div>
+
+                <!-- Real-World Applications -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-neon-green mb-4">Real-World Applications</h3>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">Ethernet:</strong> Backbone of wired LANs.</li>
+                        <li><strong class="text-electric-blue">Wi-Fi (802.11):</strong> Ubiquitous wireless LAN (CSMA/CA).</li>
+                        <li><strong class="text-electric-blue">Cellular Networks:</strong> CDMA for 3G/4G wireless.</li>
+                        <li><strong class="text-electric-blue">Data Centers:</strong> Complex link layer for traffic, load balancing, redundancy.</li>
+                        <li><strong class="text-electric-blue">Everyday Web Browsing:</strong> Link layer moves frames, uses ARP, and switches.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Questions Section -->
+        <section class="mb-16 animate-fade-in-up delay-500">
+            <h2 class="text-4xl font-outfit font-semibold text-accent-2 mb-8">Practice Questions with Model Answers</h2>
+
+            <div class="space-y-10">
+                <!-- Exercise 6.1 -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-electric-blue mb-4">Exercise 6.1: CRC Calculation (Sender)</h3>
+                    <p class="text-lg text-text-muted mb-4">If the data to be sent is <code class="text-neon-green">101110</code> and the CRC technique is used with <code class="text-neon-green">r = 3</code> and <code class="text-neon-green">G = 1010</code>.</p>
+                    <ol class="list-lower-alpha pl-5 mb-4 space-y-2 text-text-muted text-lg">
+                        <li>What is the value of R?</li>
+                        <li>What is the data that will be sent?</li>
+                    </ol>
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Model Answer:</h4>
+                    <p class="text-text-muted mb-2">Data <code class="text-neon-green">D = 101110</code>, <code class="text-neon-green">r = 3</code>, Generator <code class="text-neon-green">G = 1010</code>.</p>
+                    <ol class="list-decimal pl-5 mb-4 space-y-2 text-text-muted text-lg">
+                        <li>Append <code class="text-neon-green">r=3</code> zeros to <code class="text-neon-green">D</code>: <code class="text-neon-green">101110000</code>.</li>
+                        <li>Perform Modulo 2 Division of <code class="text-neon-green">101110000</code> by <code class="text-neon-green">1010</code>.</li>
+                    </ol>
+                    <pre class="code-block whitespace-pre-wrap text-sm md:text-base">
+<code>101110000
+1010
+-----
+000110000
+   1010
+   ----
+   0110000
+      1010
+      ----
+      01100
+         1010
+         ----
+         0110</code></pre>
+                    <p class="text-text-muted my-4 text-lg">The remainder is <code class="text-neon-green">0110</code>. Since <code class="text-neon-green">r=3</code>, we take the last 3 bits if the result is longer than <code class="text-neon-green">r</code> bits and the leading bit is 0. The remainder is <code class="text-neon-green">110</code>.</p>
+                    <p class="text-lg"><strong class="text-neon-green">a) R = 110</strong></p>
+                    <p class="text-lg"><strong class="text-neon-green">b) Transmitted data:</strong> <code class="text-neon-green">D</code> concatenated with <code class="text-neon-green">R</code> = <code class="text-neon-green">101110110</code>.</p>
+                </div>
+
+                <!-- Exercise 6.2 -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-electric-blue mb-4">Exercise 6.2: CRC Error Detection (Receiver)</h3>
+                    <p class="text-lg text-text-muted mb-4">If the data received is <code class="text-neon-green">1011101100</code> and the CRC technique is used with <code class="text-neon-green">G = 10100</code>.</p>
+                    <ol class="list-lower-alpha pl-5 mb-4 space-y-2 text-text-muted text-lg">
+                        <li>What is the value of CRC (remainder)?</li>
+                        <li>Is the data error?</li>
+                    </ol>
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Model Answer:</h4>
+                    <p class="text-text-muted mb-2">Received data <code class="text-neon-green">D_prime = 1011101100</code>, Generator <code class="text-neon-green">G = 10100</code> (5 bits).</p>
+                    <ol class="list-decimal pl-5 mb-4 space-y-2 text-text-muted text-lg">
+                        <li>Perform Modulo 2 Division of <code class="text-neon-green">1011101100</code> by <code class="text-neon-green">10100</code>.</li>
+                    </ol>
+                    <pre class="code-block whitespace-pre-wrap text-sm md:text-base">
+<code>1011101100
+10100
+--------
+0001101100
+   10100
+   -------
+   01110000
+      10100
+      -------
+      01000</code></pre>
+                    <p class="text-text-muted my-4 text-lg">The remainder is <code class="text-neon-green">01000</code>.</p>
+                    <p class="text-lg"><strong class="text-neon-green">a) The value of CRC (remainder) is 01000.</strong></p>
+                    <p class="text-lg"><strong class="text-neon-green">b) Since the remainder is 01000 (not 00000), the data is error.</strong></p>
+                </div>
+
+                <!-- Exercise 6.3a -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-electric-blue mb-4">Exercise 6.3a: CRC Calculation (Sender)</h3>
+                    <p class="text-lg text-text-muted mb-4">Consider the generator, <code class="text-neon-green">G</code>, and suppose the value as <code class="text-neon-green">D</code>. What is the value that will be transmitted if the <code class="text-neon-green">D</code> and <code class="text-neon-green">G</code> have the values of:</p>
+                    <ol class="list-lower-alpha pl-5 mb-4 space-y-2 text-text-muted text-lg">
+                        <li><code class="text-neon-green">D = 11000111010</code>, <code class="text-neon-green">G = 1001</code></li>
+                        <li><code class="text-neon-green">D = 01101010101</code>, <code class="text-neon-green">G = 1110</code></li>
+                        <li><code class="text-neon-green">D = 11111010101</code>, <code class="text-neon-green">G = 10011</code></li>
+                        <li><code class="text-neon-green">D = 10001100001</code>, <code class="text-neon-green">G = 101</code></li>
+                    </ol>
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Model Answer:</h4>
+                    <p class="text-text-muted mb-4">Calculations shown implicitly, focusing on results:</p>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">a)</strong> <code class="text-neon-green">D = 11000111010</code>, <code class="text-neon-green">G = 1001</code> (r=3). Remainder <code class="text-neon-green">R = 011</code>. <strong class="text-neon-green">Transmitted: 11000111010011.</strong></li>
+                        <li><strong class="text-electric-blue">b)</strong> <code class="text-neon-green">D = 01101010101</code>, <code class="text-neon-green">G = 1110</code> (r=3). Remainder <code class="text-neon-green">R = 100</code>. <strong class="text-neon-green">Transmitted: 01101010101100.</strong></li>
+                        <li><strong class="text-electric-blue">c)</strong> <code class="text-neon-green">D = 11111010101</code>, <code class="text-neon-green">G = 10011</code> (r=4). Remainder <code class="text-neon-green">R = 0111</code>. <strong class="text-neon-green">Transmitted: 111110101010111.</strong></li>
+                        <li><strong class="text-electric-blue">d)</strong> <code class="text-neon-green">D = 10001100001</code>, <code class="text-neon-green">G = 101</code> (r=2). Remainder <code class="text-neon-green">R = 00</code>. <strong class="text-neon-green">Transmitted: 1000110000100.</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Exercise 6.3b -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-electric-blue mb-4">Exercise 6.3b: CRC Error Detection (Receiver)</h3>
+                    <p class="text-lg text-text-muted mb-4">Consider a CRC error detection technique is used. The following table received by a receiver tabulates with D and G as data and generator with r bit pattern, respectively. Complete the table. Show your working steps (as implied by previous exercises).</p>
+                    <div class="overflow-x-auto mb-6">
+                        <table class="w-full text-text-muted text-lg border-collapse">
+                            <thead class="bg-dark-secondary text-neon-green">
+                                <tr>
+                                    <th class="py-3 px-4 text-left border-b border-glass-border">D</th>
+                                    <th class="py-3 px-4 text-left border-b border-glass-border">G</th>
+                                    <th class="py-3 px-4 text-left border-b border-glass-border">r</th>
+                                    <th class="py-3 px-4 text-left border-b border-glass-border">CRC (Received Bits)</th>
+                                    <th class="py-3 px-4 text-left border-b border-glass-border">Error (Y/N) - Model Answer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-glass-border hover:bg-glass-bg transition-colors duration-200">
+                                    <td class="py-3 px-4">101011000011</td>
+                                    <td class="py-3 px-4">10011</td>
+                                    <td class="py-3 px-4">4</td>
+                                    <td class="py-3 px-4">0011</td>
+                                    <td class="py-3 px-4 text-neon-green">N</td>
+                                </tr>
+                                <tr class="border-b border-glass-border hover:bg-glass-bg transition-colors duration-200">
+                                    <td class="py-3 px-4">11001100011</td>
+                                    <td class="py-3 px-4">1110</td>
+                                    <td class="py-3 px-4">3</td>
+                                    <td class="py-3 px-4">011</td>
+                                    <td class="py-3 px-4 text-red-400">Y</td>
+                                </tr>
+                                <tr class="border-b border-glass-border hover:bg-glass-bg transition-colors duration-200">
+                                    <td class="py-3 px-4">1111000100001</td>
+                                    <td class="py-3 px-4">11000</td>
+                                    <td class="py-3 px-4">4</td>
+                                    <td class="py-3 px-4">0001</td>
+                                    <td class="py-3 px-4 text-red-400">Y</td>
+                                </tr>
+                                <tr class="hover:bg-glass-bg transition-colors duration-200">
+                                    <td class="py-3 px-4">100010001111</td>
+                                    <td class="py-3 px-4">101</td>
+                                    <td class="py-3 px-4">2</td>
+                                    <td class="py-3 px-4">11</td>
+                                    <td class="py-3 px-4 text-red-400">Y</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Model Answer (Calculated Remainder & Error Status):</h4>
+                    <p class="text-text-muted mb-4">For each row, divide the received <code class="text-neon-green">D</code> by <code class="text-neon-green">G</code>. If the remainder is all zeros for <code class="text-neon-green">r</code> bits (e.g., <code class="text-neon-green">0000</code> for <code class="text-neon-green">r=4</code>), there is no error. Otherwise, there is an error.</p>
+                    <ul class="list-disc pl-5 space-y-3 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">a)</strong> <code class="text-neon-green">D = 101011000011</code>, <code class="text-neon-green">G = 10011</code>, <code class="text-neon-green">r = 4</code>. Calculated Remainder: <code class="text-neon-green">0000</code>. Error (Y/N): <strong class="text-neon-green">N</strong>.</li>
+                        <li><strong class="text-electric-blue">b)</strong> <code class="text-neon-green">D = 11001100011</code>, <code class="text-neon-green">G = 1110</code>, <code class="text-neon-green">r = 3</code>. Calculated Remainder: <code class="text-neon-green">111</code>. Error (Y/N): <strong class="text-red-400">Y</strong>.</li>
+                        <li><strong class="text-electric-blue">c)</strong> <code class="text-neon-green">D = 1111000100001</code>, <code class="text-neon-green">G = 11000</code>, <code class="text-neon-green">r = 4</code>. Calculated Remainder: <code class="text-neon-green">0001</code>. Error (Y/N): <strong class="text-red-400">Y</strong>.</li>
+                        <li><strong class="text-electric-blue">d)</strong> <code class="text-neon-green">D = 100010001111</code>, <code class="text-neon-green">G = 101</code>, <code class="text-neon-green">r = 2</code>. Calculated Remainder: <code class="text-neon-green">01</code>. Error (Y/N): <strong class="text-red-400">Y</strong>.</li>
+                    </ul>
+                </div>
+
+                <!-- Exercise 6.4 -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-electric-blue mb-4">Exercise 6.4: ARP and IP/MAC Addressing</h3>
+                    <p class="text-lg text-text-muted mb-4">Suppose A sends a frame to B. <br> (Note: Diagram Reference on slide 32 is not embedded. The relevant data for the network devices is provided below for context.)</p>
+                    <ol class="list-lower-alpha pl-5 mb-4 space-y-2 text-text-muted text-lg">
+                        <li>What is the source and destination IP address at X and Y?</li>
+                        <li>What is the source and destination Ethernet address at X and Y?</li>
+                    </ol>
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Diagram Data (Context):</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-text-muted text-lg mb-4">
+                        <li><strong class="text-electric-blue">Host A:</strong> IP <code class="text-neon-green">111.111.111.111</code>, MAC <code class="text-neon-green">74-29-9C-E8-FF-55</code></li>
+                        <li><strong class="text-electric-blue">Router X (left interface):</strong> IP <code class="text-neon-green">111.111.111.110</code>, MAC <code class="text-neon-green">E6-E9-00-17-BB-4B</code></li>
+                        <li><strong class="text-electric-blue">Router X (right interface, labeled Y):</strong> IP <code class="text-neon-green">222.222.222.220</code>, MAC <code class="text-neon-green">1A-23-F9-CD-06-9B</code></li>
+                        <li><strong class="text-electric-blue">Host B:</strong> IP <code class="text-neon-green">222.222.222.221</code>, MAC <code class="text-neon-green">88-B2-2F-54-1A-0F</code></li>
+                    </ul>
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Model Answer:</h4>
+                    <p class="text-text-muted mb-4">Communication path: A -> Router X (left interface) -> Router X (right interface) -> B. IP addresses are constant; MAC addresses change at each hop.</p>
+                    <p class="text-lg mb-2"><strong class="text-neon-green">a) IP Address at X (Router's left interface) and Y (Router's right interface):</strong></p>
+                    <ul class="list-disc pl-5 space-y-2 text-text-muted text-lg mb-4">
+                        <li><strong class="text-electric-blue">Source IP:</strong> <code class="text-neon-green">111.111.111.111</code> (Host A's IP)</li>
+                        <li><strong class="text-electric-blue">Destination IP:</strong> <code class="text-neon-green">222.222.222.221</code> (Host B's IP)</li>
+                    </ul>
+                    <p class="text-lg mb-2"><strong class="text-neon-green">b) Ethernet Address at X (Router's left interface) and Y (Router's right interface):</strong></p>
+                    <ul class="list-disc pl-5 space-y-2 text-text-muted text-lg">
+                        <li><strong class="text-electric-blue">At X (A sending to router's left interface):</strong>
+                            <ul class="list-disc pl-6 mt-2 space-y-1">
+                                <li><strong class="text-neon-green">Source Ethernet (MAC) Address:</strong> <code class="text-neon-green">74-29-9C-E8-FF-55</code> (Host A's MAC)</li>
+                                <li><strong class="text-neon-green">Destination Ethernet (MAC) Address:</strong> <code class="text-neon-green">E6-E9-00-17-BB-4B</code> (Router X's left interface MAC)</li>
+                            </ul>
+                        </li>
+                        <li><strong class="text-electric-blue">At Y (Router's right interface sending to B):</strong>
+                            <ul class="list-disc pl-6 mt-2 space-y-1">
+                                <li><strong class="text-neon-green">Source Ethernet (MAC) Address:</strong> <code class="text-neon-green">1A-23-F9-CD-06-9B</code> (Router X's right interface MAC)</li>
+                                <li><strong class="text-neon-green">Destination Ethernet (MAC) Address:</strong> <code class="text-neon-green">88-B2-2F-54-1A-0F</code> (Host B's MAC)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Exercise 6.5 -->
+                <div class="glass-card p-8 hover:shadow-xl hover:scale-[1.005] transition-all duration-300">
+                    <h3 class="text-2xl font-outfit font-medium text-electric-blue mb-4">Exercise 6.5: Switch Table Learning</h3>
+                    <p class="text-lg text-text-muted mb-4">Suppose A sends a frame to G, and G responds to A. Show the switch tables in S1, S3, S4. <br> (Note: Diagram Reference on slide 39 is not embedded. The problem assumes a network topology with switches S1, S2, S3, S4, and hosts A, B, C, D, E, F, G, H, I, J connected to specific interfaces.)</p>
+
+                    <h4 class="text-xl font-outfit font-medium text-neon-green mb-2">Model Answer:</h4>
+                    <p class="text-text-muted mb-4">Initially, all switch tables are empty.</p>
+
+                    <h5 class="text-lg font-outfit font-medium text-electric-blue mb-2">After A sends a frame to G:</h5>
+                    <ul class="list-disc pl-5 space-y-2 text-text-muted text-lg mb-4">
+                        <li><strong class="text-neon-green">S1 receives from A on interface 2:</strong> Learns (A, 2). Floods frame to S2 (via 4) and S4 (via 1).</li>
+                        <li><strong class="text-neon-green">S4 receives from S1 on interface 1:</strong> Learns (A, 1). Floods frame to G (via 7), E (via 5), F (via 6), H (via 8).</li>
+                        <li><strong class="text-neon-green">S2 receives from S1 on interface 4:</strong> Learns (A, 4). Floods frame to B (via 9), C (via 10), D (via 11), S3 (via 8).</li>
+                        <li><strong class="text-neon-green">S3 receives from S2 on interface 8:</strong> Learns (A, 8). Floods frame to J (15), I (14), G (13), F (12).</li>
+                    </ul>
+
+                    <h5 class="text-lg font-outfit font-medium text-electric-blue mb-2">After G responds to A:</h5>
+                    <ul class="list-disc pl-5 space-y-2 text-text-muted text-lg mb-4">
+                        <li><strong class="text-neon-green">G sends frame to S4 on interface 7:</strong> Learns (G, 7). S4 looks up A (found at interface 1). Forwards frame to S1 on interface 1.</li>
+                        <li><strong class="text-neon-green">S1 receives from S4 on interface 1:</strong> Learns (G, 1). S1 looks up A (found at interface 2). Forwards frame to A on interface 2.</li>
+                    </ul>
+
+                    <h5 class="text-lg font-outfit font-medium text-electric-blue mb-2">Final Switch Tables:</h5>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div>
+                            <p class="font-semibold text-neon-green mb-2">Switch table S1:</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-text-muted text-lg border-collapse">
+                                    <thead class="bg-dark-secondary">
+                                        <tr>
+                                            <th class="py-2 px-3 text-left border-b border-glass-border">Mac addr.</th>
+                                            <th class="py-2 px-3 text-left border-b border-glass-border">Interface</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-glass-border hover:bg-glass-bg transition-colors duration-200">
+                                            <td class="py-2 px-3">A</td>
+                                            <td class="py-2 px-3">2</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-bg transition-colors duration-200">
+                                            <td class="py-2 px-3">G</td>
+                                            <td class="py-2 px-3">1</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-neon-green mb-2">Switch table S4:</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-text-muted text-lg border-collapse">
+                                    <thead class="bg-dark-secondary">
+                                        <tr>
+                                            <th class="py-2 px-3 text-left border-b border-glass-border">Mac addr.</th>
+                                            <th class="py-2 px-3 text-left border-b border-glass-border">Interface</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-glass-border hover:bg-glass-bg transition-colors duration-200">
+                                            <td class="py-2 px-3">A</td>
+                                            <td class="py-2 px-3">1</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-bg transition-colors duration-200">
+                                            <td class="py-2 px-3">G</td>
+                                            <td class="py-2 px-3">7</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-neon-green mb-2">Switch table S3:</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-text-muted text-lg border-collapse">
+                                    <thead class="bg-dark-secondary">
+                                        <tr>
+                                            <th class="py-2 px-3 text-left border-b border-glass-border">Mac addr.</th>
+                                            <th class="py-2 px-3 text-left border-b border-glass-border">Interface</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="hover:bg-glass-bg transition-colors duration-200">
+                                            <td class="py-2 px-3">A</td>
+                                            <td class="py-2 px-3">8</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion Section -->
+        <section class="mb-16 animate-fade-in-up delay-600">
+            <h2 class="text-4xl font-outfit font-semibold text-accent-2 mb-8">Conclusion</h2>
+            <div class="glass-card p-8 transition-all duration-300 hover:shadow-xl hover:scale-[1.005]">
+                <p class="text-lg leading-relaxed text-text-muted">
+                    The Link Layer is fundamental to local network communication, ensuring reliable data transfer between adjacent nodes. It provides essential services like error detection and correction for data integrity and employs various multiple access protocols for efficient shared channel management. Link layer addressing, using MAC addresses, is vital for local frame delivery, working with ARP to map IP addresses to MAC addresses. Ethernet, the dominant wired LAN technology, operates using connectionless, unreliable principles with CSMA/CD. Link-layer switches improve network efficiency by intelligently forwarding frames and creating dedicated collision domains, while VLANs enable flexible network segmentation. A thorough understanding of the Link Layer, from its core principles to its application in data centers and web requests, is crucial for comprehending network communication.
+                </p>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
