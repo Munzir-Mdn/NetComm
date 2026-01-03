@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Transport Layer: Decoding Data Flow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary-bg': '#0a0a0f', // Deep dark background
+                        'secondary-bg': '#1a1a2e', // Slightly lighter dark for depth
+                        'accent-blue': '#4a00e0', // Vibrant blue-purple
+                        'accent-purple': '#8e2de2', // Another vibrant purple
+                        'text-light': '#e0e0e0', // Main light text
+                        'text-subtle': '#b0b0b0', // Subtler text
+                        'card-border': 'rgba(255, 255, 255, 0.1)', // Subtle border for glass cards
+                        'glass-light': 'rgba(255, 255, 255, 0.08)', // Lighter glass effect on hover/active
+                        'glass-dark': 'rgba(255, 255, 255, 0.03)', // Base glass effect
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #e0e0e0;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            overflow-x: hidden; /* Prevent horizontal scroll from background elements */
+            position: relative;
+        }
+
+        /* Subtle background animation */
+        .animated-bg-elements::before,
+        .animated-bg-elements::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            opacity: 0.2;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        .animated-bg-elements::before {
+            background-color: #4a00e0; /* Accent blue */
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .animated-bg-elements::after {
+            background-color: #8e2de2; /* Accent purple */
+            bottom: 15%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, 30px) scale(1.05); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* Glassmorphism card base style */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.05); /* Slightly less transparent than glass-dark for content sections */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .glass-card:hover {
+            background-color: rgba(255, 255, 255, 0.08); /* Slightly brighter on hover */
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Accordion specific styles */
+        .accordion-header {
+            cursor: pointer;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #e0e0e0;
+            background-color: rgba(255, 255, 255, 0.05); /* Base for accordion headers */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .accordion-header:first-child { border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
+        .accordion-header:last-of-type { border-bottom: none; } /* No border on last header for rounded bottom of card */
+        .glass-card > .accordion-header:last-child { border-bottom: none; }
+
+
+        .accordion-header:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        .accordion-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border between content and next header */
+        }
+        .accordion-content.active {
+            max-height: 1000px; /* Arbitrarily large value for smooth transition */
+            padding-bottom: 1.5rem;
+        }
+        .accordion-icon {
+            transform: rotate(0deg);
+            transition: transform 0.3s ease;
+            color: #8e2de2; /* Accent color for icon */
+        }
+        .accordion-header.active .accordion-icon {
+            transform: rotate(90deg);
+        }
+        /* Style for pre blocks within answers */
+        .accordion-content pre {
+            background-color: #0d0d14; /* Even darker background for code blocks */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Table styling within answers */
+        .accordion-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .accordion-content th, .accordion-content td {
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+        }
+        .accordion-content thead tr {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .accordion-content tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        .accordion-content tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-primary-bg text-text-light font-sans relative animated-bg-elements">
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="font-display text-5xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-blue to-accent-purple leading-tight">
+                The Transport Layer: Decoding Data Flow
+            </h1>
+            <p class="text-lg md:text-xl text-text-subtle max-w-3xl mx-auto">
+                Facilitating logical communication between application processes across the Internet.
+            </p>
+        </header>
+
+        <!-- Main Summary Section -->
+        <section class="mb-16 glass-card p-8 md:p-10">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-6 text-accent-blue">Overview</h2>
+            <p class="text-lg leading-relaxed text-text-light">
+                The Transport Layer, the fourth layer in the Internet protocol stack, facilitates <strong class="text-accent-purple">logical communication</strong> between <strong class="text-accent-purple">application processes</strong> on different <strong class="text-accent-purple">hosts</strong>. This is distinct from the network layer, which provides logical communication between hosts. The transport layer offers several key services: <strong class="text-purple-400">multiplexing</strong> and <strong class="text-purple-400">demultiplexing</strong> data from multiple applications, ensuring <strong class="text-purple-400">reliable data transfer (rdt)</strong>, managing <strong class="text-purple-400">flow control</strong> between sender and receiver, and implementing <strong class="text-purple-400">congestion control</strong> to prevent network overload. The two primary Internet transport layer protocols are <strong class="text-blue-400">UDP</strong> (User Datagram Protocol) for connectionless, unreliable transport, and <strong class="text-blue-400">TCP</strong> (Transmission Control Protocol) for connection-oriented, reliable transport.
+            </p>
+        </section>
+
+        <!-- Key Concepts Section -->
+        <section class="mb-16">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-8 text-accent-purple text-center">Key Concepts</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Logical Communication</h3>
+                        <p class="text-text-subtle">An abstract connection established by the transport layer between application processes, simulating direct connection.</p>
+                    </div>
+                </div>
+                <div class="glass-card p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Multiplexing at Sender</h3>
+                        <p class="text-text-subtle">Gathering data from multiple application <strong class="text-blue-300">sockets</strong>, appending a <strong class="text-blue-300">transport header</strong> to each <strong class="text-blue-300">segment</strong>, and forwarding them to the network layer.</p>
+                    </div>
+                </div>
+                <div class="glass-card p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Demultiplexing at Receiver</h3>
+                        <p class="text-text-subtle">Utilizing <strong class="text-blue-300">header information</strong> (destination IP address, port number) to direct incoming <strong class="text-blue-300">segments</strong> to the correct <strong class="text-blue-300">socket</strong>.</p>
+                    </div>
+                </div>
+                <div class="glass-card p-6 col-span-full">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Connectionless Transport (UDP)</h3>
+                    <ul class="list-disc list-inside text-text-subtle space-y-2">
+                        <li>Provides <strong class="text-purple-300">unreliable, unordered delivery</strong>, extending the "best-effort" IP service.</li>
+                        <li><strong class="text-purple-300">No connection establishment</strong> or handshaking.</li>
+                        <li>Minimal overhead, small header, no congestion control.</li>
+                        <li>UDP Segment Header: Source port #, Dest. port #, Length, Checksum.</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 col-span-full">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Connection-Oriented Transport (TCP)</h3>
+                    <ul class="list-disc list-inside text-text-subtle space-y-2">
+                        <li>Guarantees <strong class="text-blue-300">reliable, in-order delivery</strong> of data.</li>
+                        <li>Requires <strong class="text-blue-300">connection setup</strong> via a 3-way handshake.</li>
+                        <li>Implements <strong class="text-blue-300">flow control</strong> (receive window - rwnd) and <strong class="text-blue-300">congestion control</strong> (congestion window - cwnd).</li>
+                        <li>Supports full-duplex data transmission and pipelining.</li>
+                        <li>TCP Segment Structure: Sequence number, Acknowledgment number, Header length, Receive window, Internet checksum, control flags (ACK, SYN, FIN).</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 col-span-full">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Principles of Reliable Data Transfer (rdt)</h3>
+                    <ul class="list-disc list-inside text-text-subtle space-y-2">
+                        <li>Evolution: <strong class="text-purple-300">rdt1.0</strong> (reliable channel) → <strong class="text-purple-300">rdt2.0</strong> (bit errors, ACK/NAK) → <strong class="text-purple-300">rdt3.0</strong> (packet loss, seq #s, timers).</li>
+                        <li><strong class="text-purple-300">Stop and Wait protocol</strong>: Initial `rdt2.0` and `rdt3.0`.</li>
+                        <li><strong class="text-purple-300">Pipelining</strong>: Multiple unacknowledged segments in transit.</li>
+                        <li><strong class="text-purple-300">Go-Back-N (GBN)</strong>: Cumulative ACKs, retransmit all unacknowledged from loss point.</li>
+                        <li><strong class="text-purple-300">Selective Repeat (SR)</strong>: Individual ACKs, retransmit only specific lost packets.</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">TCP RTT & Timeout</h3>
+                    <p class="text-text-subtle">
+                        <strong class="text-blue-300">SampleRTT</strong>: Measured time from segment transmission to ACK receipt.
+                        <strong class="text-blue-300">Estimated RTT</strong>: Smoothed average.
+                        <strong class="text-blue-300">Timeout</strong>: No ACK within calculated interval.
+                    </p>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">TCP Fast Retransmit</h3>
+                    <p class="text-text-subtle">Sender retransmits unacknowledged segment upon receiving <strong class="text-blue-300">3 duplicate ACKs</strong>, avoiding timeout delay.</p>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">TCP Connection Mgmt.</h3>
+                    <p class="text-text-subtle">Uses <strong class="text-blue-300">SYN</strong> for establishment and <strong class="text-blue-300">FIN</strong> for teardown.</p>
+                </div>
+                <div class="glass-card p-6 col-span-full">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-blue">Congestion Control</h3>
+                    <p class="text-text-subtle">Occurs when "too many sources sending too much data too fast for network to handle." Leads to lost packets and long delays.</p>
+                    <ul class="list-disc list-inside text-text-subtle space-y-1 mt-3">
+                        <li><strong class="text-purple-300">End-End Congestion Control</strong>: Sender infers congestion (TCP).</li>
+                        <li><strong class="text-purple-300">Network-Assisted Congestion Control</strong>: Routers provide explicit feedback.</li>
+                        <li><strong class="text-purple-300">Phases</strong>:
+                            <ul class="list-circle list-inside ml-5">
+                                <li><strong class="text-green-300">Slow Start (SS)</strong>: `cwnd` doubles every RTT until `ssthresh`.</li>
+                                <li><strong class="text-yellow-300">Congestion Avoidance (CA)</strong>: `cwnd` increases linearly by 1 MSS every RTT.</li>
+                                <li><strong class="text-red-300">Fast Recovery (FR)</strong>: Triggered by 3 duplicate ACKs. `ssthresh` halved, `cwnd` halved + 3 MSS, then linear.</li>
+                            </ul>
+                        </li>
+                        <li><strong class="text-purple-300">Loss Events</strong>:
+                            <ul class="list-circle list-inside ml-5">
+                                <li><strong class="text-red-400">Timeout</strong>: `ssthresh` = `cwnd`/2, `cwnd` = 1 MSS (re-enter SS).</li>
+                                <li><strong class="text-orange-400">3 Duplicate ACKs</strong>: `ssthresh` = `cwnd`/2, `cwnd` = `ssthresh` + 3 MSS (enter FR).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory Aids Section -->
+        <section class="mb-16">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-8 text-accent-blue text-center">Memory Aids</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card p-6">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-purple">TCP vs. UDP</h3>
+                    <ul class="list-disc list-inside text-text-subtle space-y-2">
+                        <li><strong class="text-blue-300">T</strong>CP: <strong class="text-blue-300">T</strong>hroughput (reliable), <strong class="text-blue-300">C</strong>onnection-oriented, <strong class="text-blue-300">P</strong>rotocol (complex).</li>
+                        <li><strong class="text-purple-300">U</strong>DP: <strong class="text-purple-300">U</strong>nreliable, <strong class="text-purple-300">D</strong>atagram (connectionless), <strong class="text-purple-300">P</strong>rotocol (simple, fast).</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-purple">TCP Connection States</h3>
+                    <p class="text-text-subtle">**S**top **S**ending **A**nything:</p>
+                    <ul class="list-disc list-inside text-text-subtle space-y-2">
+                        <li><strong class="text-blue-300">SYN</strong> (client sends)</li>
+                        <li><strong class="text-blue-300">SYN-ACK</strong> (server sends)</li>
+                        <li><strong class="text-blue-300">ACK</strong> (client sends)</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-purple">TCP Congestion Control Phases</h3>
+                    <p class="text-text-subtle">**SAC**: <strong class="text-blue-300">S</strong>low Start, <strong class="text-blue-300">A</strong>voidance, <strong class="text-blue-300">C</strong>onnection (Fast Recovery - for quick connection speed restoration).</p>
+                    <p class="text-text-subtle mt-2">Also, <strong class="text-blue-300">AIMD</strong> for Congestion Avoidance (Additive Increase, Multiplicative Decrease).</p>
+                </div>
+                <div class="glass-card p-6 col-span-full">
+                    <h3 class="font-display text-2xl font-semibold mb-3 text-accent-purple">rdt Protocol Evolution</h3>
+                    <ul class="list-disc list-inside text-text-subtle space-y-2">
+                        <li><strong class="text-green-300">rdt 1.0</strong>: Assumes a "Perfect World" (no errors or loss).</li>
+                        <li><strong class="text-yellow-300">rdt 2.0</strong>: Handles an "Error-Prone World" (bit errors) using ACKs/NAKs.</li>
+                        <li><strong class="text-red-300">rdt 3.0</strong>: Addresses the "Real World" (bit errors and packet loss) using timers and sequence numbers.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Structured Study Guide Section -->
+        <section class="mb-16">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-8 text-accent-purple text-center">Structured Study Guide</h2>
+
+            <!-- What to Remember -->
+            <div class="glass-card p-8 md:p-10 mb-8">
+                <h3 class="font-display text-2xl md:text-3xl font-semibold mb-4 text-accent-blue">What to Remember</h3>
+                <ul class="list-disc list-inside text-text-subtle space-y-2">
+                    <li>The fundamental role of the transport layer and its placement relative to the application and network layers.</li>
+                    <li>The distinction between logical communication for processes (transport layer) and hosts (network layer).</li>
+                    <li>The mechanisms of multiplexing and demultiplexing, including the importance of port numbers and IP addresses.</li>
+                    <li>The core differences in services offered by UDP (connectionless, unreliable) and TCP (connection-oriented, reliable).</li>
+                    <li>The progression of reliable data transfer protocols (`rdt1.0`, `rdt2.0`, `rdt3.0`) and the techniques introduced at each stage (checksums, ACKs/NAKs, sequence numbers, timers).</li>
+                    <li>The operational differences between pipelining protocols (GBN vs. SR) in their acknowledgment and retransmission strategies.</li>
+                    <li>The components and flags of the TCP segment header and their respective functions.</li>
+                    <li>TCP's connection management process, including the 3-way handshake and connection teardown.</li>
+                    <li>How TCP estimates RTT and establishes timeout values.</li>
+                    <li>The definition of congestion and the differentiation between flow control and congestion control.</li>
+                    <li>The three primary phases of TCP congestion control (Slow Start, Congestion Avoidance, Fast Recovery) and the adjustments to `cwnd` and `ssthresh` during each phase and in response to different loss events (timeout vs. 3 duplicate ACKs).</li>
+                </ul>
+            </div>
+
+            <!-- How the Concepts Function -->
+            <div class="glass-card p-8 md:p-10 mb-8">
+                <h3 class="font-display text-2xl md:text-3xl font-semibold mb-4 text-accent-blue">How the Concepts Function</h3>
+                <ul class="list-disc list-inside text-text-subtle space-y-2">
+                    <li><strong class="text-blue-300">Multiplexing/Demultiplexing</strong>: The operating system uses the destination IP address and port number in incoming segments to route them to the correct application <strong class="text-purple-300">socket</strong>.</li>
+                    <li><strong class="text-blue-300">UDP</strong>: Applications transmit data directly as segments without prior connection setup. Fast but requires application layer reliability. Checksum detects errors but doesn't correct.</li>
+                    <li><strong class="text-blue-300">RDT Protocols</strong>: Checksums detect bit errors. ACKs confirm reception, NAKs signal errors. Sequence numbers identify packets. Timers detect lost packets. Pipelining improves utilization. GBN retransmits all unacknowledged; SR retransmits specific lost ones.</li>
+                    <li><strong class="text-blue-300">TCP</strong>:
+                        <ul class="list-circle list-inside ml-5">
+                            <li><strong class="text-green-300">Connection setup</strong>: Ensures readiness, synchronizes sequence numbers.</li>
+                            <li><strong class="text-green-300">Reliable data transfer</strong>: Via sequence numbers, cumulative ACKs, retransmission timers, fast retransmit.</li>
+                            <li><strong class="text-green-300">Flow Control</strong>: Receiver communicates available buffer space (`rwnd`) to limit sender.</li>
+                            <li><strong class="text-green-300">Congestion Control</strong>: Dynamically adjusts transmission rate based on perceived network congestion.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Common Mistakes -->
+            <div class="glass-card p-8 md:p-10 mb-8">
+                <h3 class="font-display text-2xl md:text-3xl font-semibold mb-4 text-accent-blue">Common Mistakes</h3>
+                <ul class="list-disc list-inside text-red-300 space-y-2">
+                    <li><strong class="font-semibold">Confusing Transport and Network Layers</strong>: Transport layer for processes (ports), network layer for hosts (IP addresses).</li>
+                    <li><strong class="font-semibold">Assuming UDP Reliability</strong>: UDP provides no inherent reliability.</li>
+                    <li><strong class="font-semibold">Misinterpreting ACK Numbers</strong>: TCP ACK indicates *next* expected byte, not last received.</li>
+                    <li><strong class="font-semibold">Confusing Flow Control and Congestion Control</strong>: Flow control prevents receiver overflow; congestion control prevents network overload.</li>
+                    <li><strong class="font-semibold">Incorrectly Applying Congestion Control Algorithms</strong>: Distinguish Slow Start (timeout) vs. Fast Recovery (3 duplicate ACKs) and `cwnd`/`ssthresh` modifications.</li>
+                    <li><strong class="font-semibold">Not Understanding Wraparound in Checksums</strong>: 1's complement sum requires carrying over MSB.</li>
+                </ul>
+            </div>
+
+            <!-- Effective Study Tips -->
+            <div class="glass-card p-8 md:p-10 mb-8">
+                <h3 class="font-display text-2xl md:text-3xl font-semibold mb-4 text-accent-blue">Effective Study Tips</h3>
+                <ul class="list-disc list-inside text-green-300 space-y-2">
+                    <li><strong class="font-semibold">Draw Diagrams</strong>: Visual representations of state machines, timing diagrams for protocols and congestion control.</li>
+                    <li><strong class="font-semibold">Practice Calculations</strong>: UDP checksum, RTT estimation, `cwnd`/`ssthresh` adjustments.</li>
+                    <li><strong class="font-semibold">Trace Sequence and ACK Numbers</strong>: Simulate packet loss/delay scenarios.</li>
+                    <li><strong class="font-semibold">Compare and Contrast</strong>: TCP vs. UDP, GBN vs. SR, flow control vs. congestion control.</li>
+                    <li><strong class="font-semibold">Focus on the "Why"</strong>: Understand the rationale behind each protocol feature.</li>
+                </ul>
+            </div>
+
+            <!-- Real-World Applications -->
+            <div class="glass-card p-8 md:p-10 mb-8">
+                <h3 class="font-display text-2xl md:text-3xl font-semibold mb-4 text-accent-blue">Real-World Applications</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-xl mb-2 text-accent-purple">UDP (Speed over Reliability)</h4>
+                        <ul class="list-disc list-inside text-text-subtle space-y-1">
+                            <li><strong class="text-blue-300">Streaming multimedia</strong>: Live video, VoIP (tolerant to loss, sensitive to delay).</li>
+                            <li><strong class="text-blue-300">Domain Name System (DNS)</strong>: Quick query/response.</li>
+                            <li><strong class="text-blue-300">Simple Network Management Protocol (SNMP)</strong>: Small, infrequent messages.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-xl mb-2 text-accent-purple">TCP (Reliable, Ordered Delivery)</h4>
+                        <ul class="list-disc list-inside text-text-subtle space-y-1">
+                            <li><strong class="text-blue-300">World Wide Web (HTTP)</strong>: Browsing.</li>
+                            <li><strong class="text-blue-300">Email (SMTP)</strong>: Sending/receiving.</li>
+                            <li><strong class="text-blue-300">File Transfer Protocol (FTP)</strong>: File transfers.</li>
+                            <li><strong class="text-blue-300">Telnet/SSH</strong>: Remote terminal access.</li>
+                        </ul>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h4 class="font-semibold text-xl mb-2 text-accent-purple">Congestion Control</h4>
+                        <p class="text-text-subtle">Fundamental for Internet stability, preventing network collapse and ensuring fair bandwidth allocation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Questions Section -->
+        <section class="mb-16">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-8 text-accent-blue text-center">Practice Questions</h2>
+            <div id="questions-accordion" class="space-y-4">
+                <!-- Question 1 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Question 1: Flow Control vs. Congestion Control</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="text-text-subtle pb-4">Explain the primary difference between flow control and congestion control in the transport layer.</p>
+                    </div>
+                </div>
+                <!-- Question 2 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Question 2: UDP Checksum Calculation</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="text-text-subtle pb-4">A host sends a UDP segment with the following 16-bit values for Source Port, Destination Port, and Length, respectively: 50439, 16397, 15. Calculate the UDP checksum value (in hexadecimal). Assume a one's complement sum.</p>
+                    </div>
+                </div>
+                <!-- Question 3 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Question 3: UDP Checksum Verification</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="text-text-subtle pb-4">A receiver host receives a UDP segment containing the following 16-bit values: 1287 (Source Port), 13 (Destination Port), 15 (Length), and 7ADC (Checksum). Determine if any error occurred in the received segment.</p>
+                    </div>
+                </div>
+                <!-- Question 4 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Question 4: rdt3.0 Scenario Analysis</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="text-text-subtle pb-4">Consider a scenario where Host A and Host B are communicating using the `rdt3.0` protocol, which uses sequence numbers 0 and 1. Host A sends `pkt0`, then `pkt1`.</p>
+                        <ol class="list-decimal list-inside text-text-subtle ml-4 pb-4">
+                            <li>Describe the sequence of events (sending, receiving, ACKs, retransmissions, timer actions) if `ACK0` (for `pkt0`) is lost.</li>
+                            <li>What happens if `pkt1` itself is lost?</li>
+                        </ol>
+                    </div>
+                </div>
+                <!-- Question 5 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Question 5: Go-Back-N (GBN) Timing Diagram</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="text-text-subtle pb-4">Suppose Host A and Host B use a Go-Back-N (GBN) protocol with a window size N=3. Host A sends six application messages (numbered 0 to 5) to Host B. Assume that the first acknowledgment (ACK0 for message 0) is lost, and the fifth data segment (message 4) is also lost. Message 0 is transmitted at t=0. Draw a timing diagram illustrating the data segments and acknowledgements exchanged, along with their sequence and acknowledge numbers. Indicate when retransmissions occur.</p>
+                    </div>
+                </div>
+                <!-- Question 6 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Question 6: TCP Congestion Control Table</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="text-text-subtle pb-4">Consider TCP congestion control between Host A and Host B. The initial `ssthresh` is 6 MSS. A timeout event occurs at Transmission Round (TR) = 8. Complete the table below and answer the subsequent questions.</p>
+                        <div class="overflow-x-auto my-4 text-sm md:text-base">
+                            <table class="w-full text-left border-collapse table-auto">
+                                <thead>
+                                    <tr class="bg-glass-light">
+                                        <th class="p-3 border-b border-card-border font-semibold text-text-light">TR</th>
+                                        <th class="p-3 border-b border-card-border font-semibold text-text-light">CW (segments)</th>
+                                        <th class="p-3 border-b border-card-border font-semibold text-text-light">SS (segments)</th>
+                                        <th class="p-3 border-b border-card-border font-semibold text-text-light">ssthresh</th>
+                                        <th class="p-3 border-b border-card-border font-semibold text-text-light">Phase</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">1</td>
+                                        <td class="p-3 border-b border-card-border">1</td>
+                                        <td class="p-3 border-b border-card-border">1</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">2</td>
+                                        <td class="p-3 border-b border-card-border">2</td>
+                                        <td class="p-3 border-b border-card-border">2</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">3</td>
+                                        <td class="p-3 border-b border-card-border">4</td>
+                                        <td class="p-3 border-b border-card-border">4</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">4</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">7</td>
+                                        <td class="p-3 border-b border-card-border">7</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">8</td>
+                                        <td class="p-3 border-b border-card-border">8</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">7</td>
+                                        <td class="p-3 border-b border-card-border">9</td>
+                                        <td class="p-3 border-b border-card-border">9</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">8</td>
+                                        <td class="p-3 border-b border-card-border">10</td>
+                                        <td class="p-3 border-b border-card-border">10</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">9</td>
+                                        <td class="p-3 border-b border-card-border">1</td>
+                                        <td class="p-3 border-b border-card-border">1</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">10</td>
+                                        <td class="p-3 border-b border-card-border">2</td>
+                                        <td class="p-3 border-b border-card-border">2</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">11</td>
+                                        <td class="p-3 border-b border-card-border">4</td>
+                                        <td class="p-3 border-b border-card-border">4</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">12</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">Slow Start</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">13</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">6</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                    </tr>
+                                    <tr class="hover:bg-glass-dark">
+                                        <td class="p-3 border-b border-card-border">14</td>
+                                        <td class="p-3 border-b border-card-border">7</td>
+                                        <td class="p-3 border-b border-card-border">7</td>
+                                        <td class="p-3 border-b border-card-border">5</td>
+                                        <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ol class="list-lower-alpha list-inside text-text-subtle ml-4 pb-4 space-y-2">
+                            <li>Complete the table.</li>
+                            <li>What is the new `ssthresh` after the timeout at TR=8?</li>
+                            <li>What is/are the range(s) of TRs involved in the congestion avoidance phase?</li>
+                            <li>What is/are the range(s) of TRs involved in the fast recovery phase?</li>
+                            <li>At which TR is the new `ssthresh` applied, and how many segments are sent at that TR?</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Answers Section -->
+        <section class="mb-16">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-8 text-accent-purple text-center">Model Answers</h2>
+            <div id="answers-accordion" class="space-y-4">
+                <!-- Answer 1 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Answer 1</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="text-text-subtle pb-4 space-y-3">
+                            <p><strong class="text-blue-300">Flow control</strong> in the transport layer manages the rate at which a sender transmits data to prevent the receiver's buffer from overflowing. It ensures that the sender does not overwhelm the receiver with data faster than the receiver can process it. This is typically achieved by the receiver advertising its available buffer space (e.g., `rwnd` in TCP).</p>
+                            <p><strong class="text-blue-300">Congestion control</strong>, on the other hand, manages the rate at which senders transmit data to prevent network resources (like router buffers and link bandwidth) from becoming overloaded. It aims to prevent network congestion, which can lead to packet loss and increased delays for all traffic. TCP implements congestion control by dynamically adjusting the congestion window (`cwnd`) based on network conditions inferred from packet loss or delay.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Answer 2 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Answer 2</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="text-text-subtle pb-4 space-y-3">
+                            <p>To calculate the UDP checksum:</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-2">
+                                <li><strong class="text-blue-300">Convert to 16-bit binary (or hexadecimal):</strong>
+                                    <ul class="list-disc list-inside ml-4 mt-1">
+                                        <li>Source Port #: 50439 (0xC507) = `1100010100000111`</li>
+                                        <li>Destination Port #: 16397 (0x400D) = `0100000000001101`</li>
+                                        <li>Length: 15 (0x000F) = `0000000000001111`</li>
+                                    </ul>
+                                </li>
+                                <li><strong class="text-blue-300">Perform one's complement sum:</strong>
+                                    <pre><code>    1100010100000111 (50439)
+  + 0100000000001101 (16397)
+  ------------------
+  10000010100010010 (Sum 1, with carry)
+  +                 1 (Add carry-out)
+  ------------------
+    0000010100010011 (0x0513)
+
+    0000010100010011 (Result of Sum 1)
+  + 0000000000001111 (15)
+  ------------------
+    0000010100100010 (0x0522)</code></pre>
+                                </li>
+                                <li><strong class="text-blue-300">Take the one's complement of the final sum:</strong>
+                                    <p>One's complement of `0000010100100010` is `1111101011011101`.</p>
+                                </li>
+                            </ol>
+                            <p>The UDP checksum value is <strong class="text-green-300">FADE (Hexadecimal)</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Answer 3 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Answer 3</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="text-text-subtle pb-4 space-y-3">
+                            <p>To determine if an error occurred, perform a one's complement sum of all the received 16-bit words, including the checksum. If the result is all 1s (`1111111111111111` or `0xFFFF`), no error is detected.</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-2">
+                                <li><strong class="text-blue-300">Convert to 16-bit binary (or hexadecimal):</strong>
+                                    <ul class="list-disc list-inside ml-4 mt-1">
+                                        <li>Source Port: 1287 (0x0507) = `0000010100000111`</li>
+                                        <li>Destination Port: 13 (0x000D) = `0000000000001101`</li>
+                                        <li>Length: 15 (0x000F) = `0000000000001111`</li>
+                                        <li>Checksum: 7ADC (0x7ADC) = `0111101011011100`</li>
+                                    </ul>
+                                </li>
+                                <li><strong class="text-blue-300">Perform one's complement sum of all values:</strong>
+                                    <pre><code>    0000010100000111 (1287)
+  + 0000000000001101 (13)
+  ------------------
+    0000010100010100 (0x0514)
+
+    0000010100010100 (Result of Sum 1)
+  + 0000000000001111 (15)
+  ------------------
+    0000010100100011 (0x0523)
+
+    0000010100100011 (Result of Sum 2)
+  + 0111101011011100 (7ADC)
+  ------------------
+  10000000000000000 (Sum 3, with carry)
+  +                 1 (Add carry-out)
+  ------------------
+    0000000000000001 (0x0001)</code></pre>
+                                </li>
+                                <li><strong class="text-blue-300">Check the final sum:</strong>
+                                    <p>The final sum `0000000000000001` (0x0001) is not `1111111111111111` (0xFFFF).</p>
+                                </li>
+                            </ol>
+                            <p>Therefore, <strong class="text-red-300">an error is detected</strong> in the received segment.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Answer 4 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Answer 4</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="text-text-subtle pb-4 space-y-3">
+                            <p>The `rdt3.0` protocol uses alternating sequence numbers (0 and 1) and timers to handle bit errors and packet loss.</p>
+                            <ol class="list-decimal list-inside ml-4 space-y-2">
+                                <li><strong class="text-blue-300">Scenario: ACK0 is lost</strong>
+                                    <ul class="list-disc list-inside ml-4 mt-1 space-y-1">
+                                        <li>Host A sends `pkt0` (seq=0) and starts a timer.</li>
+                                        <li>Host B receives `pkt0` correctly, sends `ACK0` (acknowledging `pkt0` and expecting `pkt1`), and delivers `pkt0` to the application layer.</li>
+                                        <li>`ACK0` is lost in transit to Host A.</li>
+                                        <li>Host A's timer for `pkt0` eventually expires.</li>
+                                        <li>Upon timeout, Host A retransmits `pkt0` (seq=0) and restarts its timer.</li>
+                                        <li>Host B receives the retransmitted `pkt0`. Since Host B has already received `pkt0` and is expecting `pkt1`, it recognizes this as a duplicate (due to the sequence number). Host B discards the duplicate `pkt0` but re-sends `ACK0` to confirm its last correct reception.</li>
+                                        <li>Host A receives `ACK0`, confirming `pkt0` was received. It then sends `pkt1` (seq=1) and starts a timer for `pkt1`.</li>
+                                        <li>Host B receives `pkt1` correctly, sends `ACK1`, and delivers `pkt1`.</li>
+                                        <li>Host A receives `ACK1` and stops its timer.</li>
+                                    </ul>
+                                </li>
+                                <li><strong class="text-blue-300">Scenario: pkt1 is lost</strong>
+                                    <ul class="list-disc list-inside ml-4 mt-1 space-y-1">
+                                        <li>Host A sends `pkt0` (seq=0) and starts a timer.</li>
+                                        <li>Host B receives `pkt0` correctly, sends `ACK0`, and delivers `pkt0`.</li>
+                                        <li>Host A receives `ACK0`, stops its timer for `pkt0`, and sends `pkt1` (seq=1), starting a timer for `pkt1`.</li>
+                                        <li>`pkt1` is lost in transit to Host B.</li>
+                                        <li>Host B does not receive `pkt1`, so it doesn't send any `ACK`.</li>
+                                        <li>Host A's timer for `pkt1` eventually expires.</li>
+                                        <li>Upon timeout, Host A retransmits `pkt1` (seq=1) and restarts its timer.</li>
+                                        <li>Host B receives the retransmitted `pkt1` correctly, sends `ACK1`, and delivers `pkt1`.</li>
+                                        <li>Host A receives `ACK1` and stops its timer.</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- Answer 5 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Answer 5</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="text-text-subtle pb-4 space-y-3">
+                            <p>Here is a timing diagram for the Go-Back-N (GBN) protocol with N=3. Assume packets are <code class="bg-gray-800 p-1 rounded">Pkt&lt;SeqNum&gt;</code> and ACKs are <code class="bg-gray-800 p-1 rounded">ACK&lt;ExpectedSeqNum&gt;</code>.</p>
+                            <pre><code>Time
+| Host A (Sender)                          | Host B (Receiver)
+|------------------------------------------|----------------------------------------
+0 | Send Pkt0 (Window: [0,1,2])            |
+|                                          | Receive Pkt0
+|                                          | Send ACK1 (Expecting Pkt1)
+| Send Pkt1 (Window: [0,1,2])            |
+|                                          | Receive Pkt1
+|                                          | Send ACK1 (Expecting Pkt1, still)
+| Send Pkt2 (Window: [0,1,2])            |
+|                                          | Receive Pkt2
+|                                          | Send ACK1 (Expecting Pkt1, still)
+|                                          |
+|  ACK1 (for Pkt0) LOST                    |
+|                                          |
+| Timeout for Pkt0 (Oldest unACK'd packet) |
+| Retransmit Pkt0                          | Receive Pkt0 (duplicate)
+| Retransmit Pkt1                          | Send ACK1 (Expecting Pkt1)
+| Retransmit Pkt2                          | Receive Pkt1
+|                                          | Send ACK2 (Expecting Pkt2)
+|                                          | Receive Pkt2
+|                                          | Send ACK3 (Expecting Pkt3)
+|                                          |
+| Receive ACK3 (Cumulative ACK for Pkt0, Pkt1, Pkt2)
+| (Window slides to [3,4,5])               |
+| Send Pkt3                                | Receive Pkt3
+| Send Pkt4 (Message 4) LOST             | Send ACK4 (Expecting Pkt4)
+| Send Pkt5                                |
+|                                          | Receive Pkt5 (out of order, expecting Pkt4)
+|                                          | DISCARD Pkt5, Send ACK4 (re-ACKing Pkt3, indicating Pkt4 not received)
+|                                          |
+| Timeout for Pkt3 (Oldest unACK'd packet) |
+| Retransmit Pkt3                          | Receive Pkt3 (duplicate)
+| Retransmit Pkt4                          | Send ACK4 (Expecting Pkt4)
+| Retransmit Pkt5                          | Receive Pkt4
+|                                          | Send ACK5 (Expecting Pkt5)
+|                                          | Receive Pkt5
+|                                          | Send ACK6 (Expecting Pkt6, all received)
+| Receive ACK6                             |
+</code></pre>
+                            <p class="mt-4">In a GBN protocol, the receiver discards out-of-order packets and *always* re-sends the ACK for the last correctly received, in-order packet. If <code class="bg-gray-800 p-1 rounded">ACK1</code> is lost, Host B would continue sending <code class="bg-gray-800 p-1 rounded">ACK1</code> for any subsequent packets it receives, discarding anything with sequence numbers greater than 0, until <code class="bg-gray-800 p-1 rounded">Pkt1</code> is correctly received after <code class="bg-gray-800 p-1 rounded">Pkt0</code>.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Answer 6 -->
+                <div class="glass-card overflow-hidden">
+                    <div class="accordion-header text-text-light flex items-center justify-between">
+                        <span class="font-semibold text-xl">Answer 6</span>
+                        <svg class="accordion-icon w-5 h-5 ml-2 transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="text-text-subtle pb-4 space-y-3">
+                            <h3 class="font-semibold text-lg text-blue-300">a) Completed Table:</h3>
+                            <div class="overflow-x-auto my-4 text-sm md:text-base">
+                                <table class="w-full text-left border-collapse table-auto">
+                                    <thead>
+                                        <tr class="bg-glass-light">
+                                            <th class="p-3 border-b border-card-border font-semibold text-text-light">TR</th>
+                                            <th class="p-3 border-b border-card-border font-semibold text-text-light">CW (segments)</th>
+                                            <th class="p-3 border-b border-card-border font-semibold text-text-light">SS (segments)</th>
+                                            <th class="p-3 border-b border-card-border font-semibold text-text-light">ssthresh</th>
+                                            <th class="p-3 border-b border-card-border font-semibold text-text-light">Phase</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">1</td>
+                                            <td class="p-3 border-b border-card-border">1</td>
+                                            <td class="p-3 border-b border-card-border">1</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">2</td>
+                                            <td class="p-3 border-b border-card-border">2</td>
+                                            <td class="p-3 border-b border-card-border">2</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">3</td>
+                                            <td class="p-3 border-b border-card-border">4</td>
+                                            <td class="p-3 border-b border-card-border">4</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">4</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">7</td>
+                                            <td class="p-3 border-b border-card-border">7</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">8</td>
+                                            <td class="p-3 border-b border-card-border">8</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">7</td>
+                                            <td class="p-3 border-b border-card-border">9</td>
+                                            <td class="p-3 border-b border-card-border">9</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">8</td>
+                                            <td class="p-3 border-b border-card-border">10</td>
+                                            <td class="p-3 border-b border-card-border">10</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">9</td>
+                                            <td class="p-3 border-b border-card-border">1</td>
+                                            <td class="p-3 border-b border-card-border">1</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">10</td>
+                                            <td class="p-3 border-b border-card-border">2</td>
+                                            <td class="p-3 border-b border-card-border">2</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">11</td>
+                                            <td class="p-3 border-b border-card-border">4</td>
+                                            <td class="p-3 border-b border-card-border">4</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">12</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">Slow Start</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">13</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">6</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                        </tr>
+                                        <tr class="hover:bg-glass-dark">
+                                            <td class="p-3 border-b border-card-border">14</td>
+                                            <td class="p-3 border-b border-card-border">7</td>
+                                            <td class="p-3 border-b border-card-border">7</td>
+                                            <td class="p-3 border-b border-card-border">5</td>
+                                            <td class="p-3 border-b border-card-border">Congestion Avoidance</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3 class="font-semibold text-lg text-blue-300">b) What is the new `ssthresh` after the timeout at TR=8?</h3>
+                            <p>At TR=8, `cwnd` was 10. Upon timeout, `ssthresh` is set to `cwnd` (just before loss event) / 2. New `ssthresh` = 10 / 2 = <strong class="text-green-300">5 MSS</strong>.</p>
+
+                            <h3 class="font-semibold text-lg text-blue-300">c) What is/are the range(s) of TRs involved in the congestion avoidance phase?</h3>
+                            <p>The congestion avoidance phase occurs when `cwnd` is greater than or equal to `ssthresh` and there is no loss event forcing a reset to Slow Start. First period: <strong class="text-green-300">TR 5 to TR 8</strong>. Second period: <strong class="text-green-300">TR 13 to TR 14</strong> (and onwards).</p>
+
+                            <h3 class="font-semibold text-lg text-blue-300">d) What is/are the range(s) of TRs involved in the fast recovery phase?</h3>
+                            <p>Fast recovery is triggered by 3 duplicate ACKs, not by a timeout. Since the loss event was a timeout, there is <strong class="text-red-300">no fast recovery phase</strong> in this scenario.</p>
+
+                            <h3 class="font-semibold text-lg text-blue-300">e) At which TR is the new `ssthresh` applied, and how many segments are sent at that TR?</h3>
+                            <p>The new `ssthresh` (5 MSS) is calculated *after* the timeout at TR=8. It is applied at the beginning of the next Slow Start phase, which starts at <strong class="text-green-300">TR 9</strong>. At TR 9, `cwnd` is reset to 1, and <strong class="text-green-300">1 segment</strong> is sent.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Concluding Summary Section -->
+        <section class="mb-16 glass-card p-8 md:p-10">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-6 text-accent-blue">Concluding Summary</h2>
+            <p class="text-lg leading-relaxed text-text-light">
+                This chapter has provided a comprehensive overview of the Transport Layer, a critical component of network communication. We explored its role in enabling logical communication between application processes, contrasting it with the network layer's host-to-host focus. Key services such as multiplexing/demultiplexing, reliable data transfer, flow control, and congestion control were detailed. We examined the distinct characteristics of the two primary transport protocols: UDP, offering connectionless and unreliable "best-effort" service, and TCP, providing robust connection-oriented, reliable, and in-order data delivery with sophisticated flow and congestion control mechanisms. The evolution of reliable data transfer protocols (`rdt` versions), the mechanics of pipelined protocols like Go-Back-N and Selective Repeat, and the intricate processes of TCP connection management, RTT estimation, and its three-phase congestion control algorithm (Slow Start, Congestion Avoidance, and Fast Recovery) were thoroughly discussed. Understanding these principles is fundamental to comprehending how applications reliably and efficiently exchange data across diverse and often challenging network environments.
+            </p>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const setupAccordion = (accordionId) => {
+                const accordion = document.getElementById(accordionId);
+                if (!accordion) return;
+
+                accordion.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const content = header.nextElementSibling;
+                        const icon = header.querySelector('.accordion-icon');
+
+                        const isActive = header.classList.contains('active');
+
+                        // Close all other active accordions in the same group
+                        accordion.querySelectorAll('.accordion-header').forEach(otherHeader => {
+                            if (otherHeader !== header && otherHeader.classList.contains('active')) {
+                                otherHeader.classList.remove('active');
+                                otherHeader.nextElementSibling.classList.remove('active');
+                            }
+                        });
+
+                        // Toggle current accordion
+                        header.classList.toggle('active', !isActive);
+                        content.classList.toggle('active', !isActive);
+                    });
+                });
+            };
+
+            setupAccordion('questions-accordion');
+            setupAccordion('answers-accordion');
+        });
+    </script>
+</body>
+</html>

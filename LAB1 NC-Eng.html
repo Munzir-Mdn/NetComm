@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireshark Protocol Analysis Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for glow and background effects */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(at top left, hsl(220, 30%, 10%) 0%, transparent 50%),
+                        radial-gradient(at bottom right, hsl(280, 20%, 10%) 0%, transparent 50%),
+                        hsl(220, 20%, 8%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Subtle text glow for the main title */
+        .text-glow-cyan {
+            text-shadow: 0 0 5px hsl(180, 70%, 50%),
+                         0 0 10px hsl(180, 70%, 50%, 0.7),
+                         0 0 15px hsl(180, 70%, 50%, 0.5);
+        }
+
+        /* Glassmorphism card background with subtle animation */
+        .card-bg {
+            background: rgba(255, 255, 255, 0.03); /* Frosted glass base */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+            animation: move-bg 20s infinite linear;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes move-bg {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Gradient text for section titles */
+        .text-gradient {
+            background: linear-gradient(to right, hsl(180, 70%, 60%), hsl(280, 70%, 70%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Accordion specific styles */
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .accordion-header:hover {
+            background-color: hsl(220, 15%, 18%);
+            color: hsl(180, 70%, 60%);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        .accordion-content.active {
+            max-height: 500px; /* Max height large enough for content */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .focus-ring-cyan:focus-visible {
+            outline: 2px solid hsl(180, 70%, 60%);
+            outline-offset: 2px;
+            border-radius: 0.5rem; /* Match card border radius */
+        }
+
+    </style>
+</head>
+<body class="text-gray-200 font-body antialiased selection:bg-accent-cyan-light selection:text-black">
+    <div class="container mx-auto px-4 py-12 max-w-7xl relative z-10">
+        <!-- Main Title -->
+        <header class="text-center mb-16 relative">
+            <h1 class="font-display text-5xl md:text-7xl font-extrabold leading-tight text-gradient text-glow-cyan">
+                Comprehensive Study Guide
+            </h1>
+            <p class="mt-4 text-xl md:text-2xl font-semibold text-gray-300">
+                Packet Analysis at Application Layer Using Wireshark
+            </p>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="w-full h-1 bg-gradient-to-r from-transparent via-accent-cyan-light to-transparent opacity-20 blur-sm"></div>
+            </div>
+        </header>
+
+        <!-- Summary Section -->
+        <section class="mb-16 card-bg rounded-xl p-8 md:p-12 shadow-2xl relative z-20 hover:shadow-cyan-500/30 transition-shadow duration-300">
+            <h2 class="text-4xl font-display font-bold mb-6 text-gradient">Summary</h2>
+            <p class="text-lg leading-relaxed mb-6 text-gray-300">
+                This study guide focuses on <strong class="text-accent-cyan-light">network protocol analysis</strong> at the application layer using <strong class="text-accent-cyan-light">Wireshark</strong>, a <strong class="text-accent-cyan-light">packet sniffer</strong>. Its primary goal is to provide a fundamental understanding of network protocol operations by observing message exchanges. Key objectives include familiarizing users with Wireshark as a <strong class="text-accent-cyan-light">packet analyzer</strong> and specifically analyzing application layer protocols like <strong class="text-accent-cyan-light">HTTP (Hypertext Transfer Protocol)</strong> and <strong class="text-accent-cyan-light">DNS (Domain Name System)</strong>. The guide also introduces command-line tools: <code class="bg-gray-800 text-accent-purple px-2 py-1 rounded">nslookup</code> for DNS queries and <code class="bg-gray-800 text-accent-purple px-2 py-1 rounded">ipconfig</code> for network configuration and DNS cache management.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">Packet Sniffer</h3>
+                    <p class="text-gray-400">A passive tool (e.g., Wireshark) that captures, stores, and displays network messages without sending its own packets.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">Packet Capture Library (pcap)</h3>
+                    <p class="text-gray-400">A component of a packet sniffer that copies all link-layer frames from a network interface.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">Packet Analyzer</h3>
+                    <p class="text-gray-400">A component that interprets and decodes protocol fields within captured messages for human understanding.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">Wireshark</h3>
+                    <p class="text-gray-400">A popular graphical user interface (GUI) network protocol analyzer.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">HTTP</h3>
+                    <p class="text-gray-400">The protocol for World Wide Web data communication, used for fetching resources like HTML documents.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">DNS</h3>
+                    <p class="text-gray-400">A hierarchical system that translates human-readable domain names into numerical IP addresses.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">nslookup</h3>
+                    <p class="text-gray-400">A command-line tool for querying DNS to obtain domain name/IP address mappings and other DNS records.</p>
+                </div>
+                <div class="card-bg p-6 rounded-lg hover:shadow-lg transition-shadow duration-300 col-span-1 md:col-span-2 lg:col-span-1">
+                    <h3 class="text-xl font-display font-semibold mb-2 text-accent-cyan-light">ipconfig</h3>
+                    <p class="text-gray-400">A Windows command-line utility displaying current TCP/IP network configuration and allowing modification of DHCP and DNS settings.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Concepts Section -->
+        <section class="mb-16">
+            <h2 class="text-4xl font-display font-bold mb-8 text-gradient text-center">Key Concepts</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-purple">Packet Sniffer Fundamentals</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li>A <strong class="text-accent-cyan-light">packet sniffer</strong> is a passive tool that <strong class="text-accent-cyan-light">observes network messages</strong> without interference.</li>
+                        <li>It consists of a <strong class="text-accent-cyan-light">packet capture library</strong> (e.g., pcap) for data collection and a <strong class="text-accent-cyan-light">packet analyzer</strong> for decoding.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-purple">Wireshark Interface</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-accent-cyan-light">Command menus:</strong> Standard file, edit, view, capture, analyze, etc. options.</li>
+                        <li><strong class="text-accent-cyan-light">Packet display filter field:</strong> For filtering displayed packets by protocol, IP address, port, etc. (e.g., "http", "dns", "ip.addr == 192.168.1.1").</li>
+                        <li><strong class="text-accent-cyan-light">Packet-listing window:</strong> Summarizes each captured packet (number, time, source, destination, protocol, info).</li>
+                        <li><strong class="text-accent-cyan-light">Packet-header details window:</strong> Hierarchical details of a selected packet's headers across layers (Ethernet, IP, TCP/UDP, Application).</li>
+                        <li><strong class="text-accent-cyan-light">Packet-contents window:</strong> Displays raw hexadecimal and ASCII content of the selected packet.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300 md:col-span-2">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-purple">HTTP Protocol Analysis</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li>Analyzing <strong class="text-accent-cyan-light">HTTP GET/response interactions</strong>, identifying <strong class="text-accent-cyan-light">HTTP versions</strong>, <strong class="text-accent-cyan-light">client/server IP addresses</strong>, <strong class="text-accent-cyan-light">content length</strong>, and <strong class="text-accent-cyan-light">status codes</strong> (e.g., 200 OK, 304 Not Modified).</li>
+                        <li>Understanding <strong class="text-accent-cyan-light">HTTP Conditional GET requests</strong> using the <code class="bg-gray-800 text-accent-purple px-1 rounded">IF-MODIFIED-SINCE</code> header to check resource changes, and server responses like <code class="bg-gray-800 text-accent-purple px-1 rounded">304 Not Modified</code> to save bandwidth.</li>
+                        <li>Tracing <strong class="text-accent-cyan-light">HTML documents with embedded objects</strong> (e.g., images), noting that each object often triggers a separate HTTP GET request.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-purple">DNS Protocol Analysis</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li>Identifying <strong class="text-accent-cyan-light">DNS query and response messages</strong>.</li>
+                        <li>Determining if DNS queries/responses use <strong class="text-accent-cyan-light">UDP or TCP</strong> (typically UDP for standard queries, TCP for zone transfers or large responses).</li>
+                        <li>Locating the <strong class="text-accent-cyan-light">destination port for DNS queries (53)</strong> and <strong class="text-accent-cyan-light">source port for DNS responses (53)</strong>.</li>
+                        <li>Examining <strong class="text-accent-cyan-light">DNS query message types</strong> (e.g., Type A for IPv4) and the <strong class="text-accent-cyan-light">absence of answers in queries</strong>.</li>
+                        <li>Analyzing <strong class="text-accent-cyan-light">DNS response messages</strong> for the number and content of <strong class="text-accent-cyan-light">answers</strong> (e.g., A records, CNAME records).</li>
+                        <li>Tracing the <strong class="text-accent-cyan-light">IP address</strong> to which DNS queries are sent (typically the <strong class="text-accent-cyan-light">local DNS server</strong>).</li>
+                        <li>Understanding the relationship between DNS resolution and subsequent <strong class="text-accent-cyan-light">TCP SYN packets</strong>.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-purple">Network Configuration Utilities</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><code class="bg-gray-800 text-accent-purple px-1 rounded">nslookup</code>: Used to <strong class="text-accent-cyan-light">query DNS servers</strong> for domain IP addresses (e.g., <code class="bg-gray-800 text-accent-purple px-1 rounded">nslookup www.microsoft.com</code>) and identify <strong class="text-accent-cyan-light">non-authoritative DNS servers</strong>.</li>
+                        <li><code class="bg-gray-800 text-accent-purple px-1 rounded">ipconfig</code>: <code class="bg-gray-800 text-accent-purple px-1 rounded">ipconfig /all</code> displays detailed <strong class="text-accent-cyan-light">TCP/IP configuration</strong> (IP address, subnet mask, DNS servers, physical address). <code class="bg-gray-800 text-accent-purple px-1 rounded">ipconfig /displaydns</code> shows the local <strong class="text-accent-cyan-light">DNS resolver cache</strong>.</li>
+                        <li><code class="bg-gray-800 text-accent-purple px-1 rounded">ipconfig /flushdns</code>: Clears the local DNS cache.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory Aids Section -->
+        <section class="mb-16 card-bg rounded-xl p-8 md:p-12 shadow-2xl relative z-20 hover:shadow-purple-500/30 transition-shadow duration-300">
+            <h2 class="text-4xl font-display font-bold mb-8 text-gradient text-center">Memory Aids</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="border border-accent-purple-dark bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-display font-semibold mb-3 text-accent-purple">Wireshark GUI (C-L-H-P-D)</h3>
+                    <ul class="list-disc list-inside text-gray-400 space-y-1">
+                        <li><strong class="text-accent-cyan-light">C</strong>ommand menus: Top bar.</li>
+                        <li><strong class="text-accent-cyan-light">L</strong>isting window: Packet summary.</li>
+                        <li><strong class="text-accent-cyan-light">H</strong>eader details: Layer-by-layer breakdown.</li>
+                        <li><strong class="text-accent-cyan-light">P</strong>acket contents: Raw hex/ASCII.</li>
+                        <li><strong class="text-accent-cyan-light">D</strong>isplay filter: Filters displayed packets.</li>
+                    </ul>
+                </div>
+                <div class="border border-accent-purple-dark bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-display font-semibold mb-3 text-accent-purple">DNS</h3>
+                    <p class="text-gray-400">"Domain Name Service" - Translates domain names to IP addresses.</p>
+                </div>
+                <div class="border border-accent-purple-dark bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-display font-semibold mb-3 text-accent-purple">HTTP</h3>
+                    <p class="text-gray-400">"HyperText Transfer Protocol" - The protocol for web communication (GET/Response).</p>
+                </div>
+                <div class="border border-accent-purple-dark bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-display font-semibold mb-3 text-accent-purple">nslookup</h3>
+                    <p class="text-gray-400">"Name Server Lookup" - Manually queries DNS for an IP address.</p>
+                </div>
+                <div class="border border-accent-purple-dark bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-display font-semibold mb-3 text-accent-purple">ipconfig</h3>
+                    <p class="text-gray-400">"IP Configuration" - Checks local network settings and manages DNS cache.</p>
+                </div>
+                <div class="border border-accent-purple-dark bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-2xl font-display font-semibold mb-3 text-accent-purple">Filters</h3>
+                    <ul class="list-disc list-inside text-gray-400 space-y-1">
+                        <li><strong class="text-accent-cyan-light">Capture Filter:</strong> Limits <em class="italic">*what Wireshark saves*</em> during capture (e.g., <code class="bg-gray-800 text-accent-purple px-1 rounded">port 80</code>).</li>
+                        <li><strong class="text-accent-cyan-light">Display Filter:</strong> Limits <em class="italic">*what you see*</em> from captured data (e.g., <code class="bg-gray-800 text-accent-purple px-1 rounded">http</code>).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Structured Study Guide Section -->
+        <section class="mb-16">
+            <h2 class="text-4xl font-display font-bold mb-8 text-gradient text-center">Structured Study Guide</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-cyan-light">What to Remember</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-accent-purple">Wireshark's role:</strong> A non-intrusive tool for network analysis and protocol understanding.</li>
+                        <li><strong class="text-accent-purple">Two main components:</strong> Packet capture (raw data collection) and packet analysis (data interpretation).</li>
+                        <li><strong class="text-accent-purple">Key interface elements:</strong> Packet summaries, detailed headers, raw data, and filter application.</li>
+                        <li><strong class="text-accent-purple">HTTP basics:</strong> Request/response model, GET method, status codes (200 OK, 304 Not Modified).</li>
+                        <li><strong class="text-accent-purple">DNS basics:</strong> Name-to-IP resolution, UDP port 53 for standard queries, query/response structure.</li>
+                        <li><strong class="text-accent-purple">Command-line tools:</strong> <code class="bg-gray-800 text-accent-purple px-1 rounded">nslookup</code> for DNS queries, <code class="bg-gray-800 text-accent-purple px-1 rounded">ipconfig</code> for network configuration and DNS cache management.</li>
+                        <li><strong class="text-accent-purple">Filtering:</strong> Differentiate between capture filters (limit storage) and display filters (limit viewing).</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-cyan-light">How the Concepts Function</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-accent-purple">Wireshark:</strong> A network interface's driver sends a <em class="italic">copy</em> of link-layer frames to the packet capture library. The packet analyzer decodes these frames layer by layer according to protocol specifications.</li>
+                        <li><strong class="text-accent-purple">HTTP GET/Response:</strong> A client sends an HTTP GET request for a resource. The server processes it and sends an HTTP response, including the resource and a status code.</li>
+                        <li><strong class="text-accent-purple">HTTP Conditional GET:</strong> A client sends a GET request with an <code class="bg-gray-800 text-accent-purple px-1 rounded">IF-MODIFIED-SINCE</code> header (timestamp of cached resource). If the server resource hasn't changed, it responds with <code class="bg-gray-800 text-accent-purple px-1 rounded">304 Not Modified</code>, instructing the client to use its cached version.</li>
+                        <li><strong class="text-accent-purple">DNS Resolution:</strong> When a domain name is entered, the OS checks its cache. If not found, it sends a DNS query (UDP to port 53) to a local DNS server. This server may query other DNS servers hierarchically until the IP address is found and returned to the client.</li>
+                        <li><strong class="text-accent-purple">`nslookup`:</strong> Sends DNS queries to a specified or default DNS server and displays returned resource records.</li>
+                        <li><strong class="text-accent-purple">`ipconfig`:</strong> Queries the OS network stack for current IP configuration or interacts with the DNS resolver cache.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-cyan-light">Common Mistakes</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-red-400">Incorrect interface selection:</strong> Capturing on the wrong network adapter.</li>
+                        <li><strong class="text-red-400">Filter syntax errors:</strong> Typographical errors or incorrect protocol names in filters.</li>
+                        <li><strong class="text-red-400">Misinterpreting "passive" capture:</strong> Believing Wireshark can modify traffic.</li>
+                        <li><strong class="text-red-400">Forgetting to stop capture:</strong> Leads to excessively large trace files.</li>
+                        <li><strong class="text-red-400">Not understanding layered protocols:</strong> Failing to correlate information across different layers.</li>
+                        <li><strong class="text-red-400">Assuming DNS always uses UDP:</strong> DNS can use TCP for zone transfers or large responses.</li>
+                        <li><strong class="text-red-400">Overlooking local DNS cache:</strong> <code class="bg-gray-800 text-accent-purple px-1 rounded">ipconfig /displaydns</code> shows cached entries, not necessarily current public records.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-cyan-light">Effective Study Tips</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-green-400">Hands-on Practice:</strong> Actively use Wireshark to capture and analyze your own network traffic.</li>
+                        <li><strong class="text-green-400">Experiment with Filters:</strong> Practice applying various capture and display filters.</li>
+                        <li><strong class="text-green-400">Trace Specific Scenarios:</strong> Reproduce known network events and analyze the traces.</li>
+                        <li><strong class="text-green-400">Read Protocol RFCs:</strong> Refer to official Request for Comments (RFCs) for deeper understanding.</li>
+                        <li><strong class="text-green-400">Draw Network Diagrams:</strong> Visualize packet flow for complex interactions.</li>
+                        <li><strong class="text-green-400">Utilize Sample Trace Files:</strong> Practice analyzing provided <code class="bg-gray-800 text-accent-purple px-1 rounded">.pcapng</code> files.</li>
+                        <li><strong class="text-green-400">Explore Wireshark's Features:</strong> Familiarize yourself with "Follow TCP Stream," statistics, and expert information.</li>
+                    </ul>
+                </div>
+                <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300 md:col-span-2">
+                    <h3 class="text-3xl font-display font-semibold mb-4 text-accent-cyan-light">Real-World Applications</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><strong class="text-accent-purple">Network Troubleshooting:</strong> Diagnosing connectivity issues, slow performance, or communication failures.</li>
+                        <li><strong class="text-accent-purple">Security Analysis:</strong> Detecting suspicious activities like port scanning, malware communication, or DoS attacks.</li>
+                        <li><strong class="text-accent-purple">Application Development and Debugging:</strong> Verifying protocol implementation and debugging communication errors.</li>
+                        <li><strong class="text-accent-purple">Performance Monitoring:</strong> Analyzing latency, throughput, and packet loss.</li>
+                        <li><strong class="text-accent-purple">Protocol Research and Education:</strong> Providing a visual way to understand network protocols.</li>
+                        <li><strong class="text-accent-purple">Compliance and Auditing:</strong> Capturing traffic for regulatory compliance or forensic analysis.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Questions Section -->
+        <section class="mb-16">
+            <h2 class="text-4xl font-display font-bold mb-8 text-gradient text-center">Practice Questions with Model Answers</h2>
+
+            <!-- Part B.1 -->
+            <div class="card-bg rounded-xl p-8 mb-8 hover:shadow-lg transition-shadow duration-300">
+                <h3 class="text-3xl font-display font-semibold mb-6 text-accent-purple">Part B.1: The Basic HTTP GET/response interaction</h3>
+                <div class="space-y-6">
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>1. What version of HTTP is the server running?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> HTTP/1.1 (most common).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>2. What is the IP address of the client computer?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> (e.g., 192.168.1.102).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>3. What is the IP address of the gaia.cs.umass.edu server?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> (e.g., 128.121.50.122).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>4. How many bytes of content are being returned to the client browser?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Determined by the "Content-Length" header in the HTTP response (e.g., 656 bytes).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>5. What is the status code returned from the server to the client browser?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Typically <code class="bg-gray-800 text-accent-purple px-1 rounded">200 OK</code> for a successful initial request.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part B.2 -->
+            <div class="card-bg rounded-xl p-8 mb-8 hover:shadow-lg transition-shadow duration-300">
+                <h3 class="text-3xl font-display font-semibold mb-6 text-accent-purple">Part B.2: The HTTP CONDITIONAL GET/response interaction</h3>
+                <div class="space-y-6">
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>1. Do you see an “IF-MODIFIED-SINCE” line in the first HTTP GET request?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> No, the first GET request usually lacks this header.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>2. Did the server explicitly return the contents of the file after the first GET request? How can you tell?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Yes, indicated by <code class="bg-gray-800 text-accent-purple px-1 rounded">200 OK</code> status code and a <code class="bg-gray-800 text-accent-purple px-1 rounded">Content-Length</code> header.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>3. Do you see an “IF-MODIFIED-SINCE:” line in the second HTTP GET request? If so, what information follows?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Yes, followed by a timestamp (e.g., <code class="bg-gray-800 text-accent-purple px-1 rounded">IF-MODIFIED-SINCE: Thu, 01 Jan 1970 00:00:00 GMT</code>).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>4. What is the HTTP status code and phrase returned from the server in response to this second HTTP GET? Did the server explicitly return the contents of the file? Explain.</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Status code <code class="bg-gray-800 text-accent-purple px-1 rounded">304 Not Modified</code>. No, the server did not return contents; this code indicates the resource hasn't changed since the <code class="bg-gray-800 text-accent-purple px-1 rounded">IF-MODIFIED-SINCE</code> timestamp, so the client uses its cache.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part B.3 -->
+            <div class="card-bg rounded-xl p-8 mb-8 hover:shadow-lg transition-shadow duration-300">
+                <h3 class="text-3xl font-display font-semibold mb-6 text-accent-purple">Part B.3: HTML Documents with Embedded Objects</h3>
+                <div class="space-y-6">
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>1. How many HTTP GET request messages did the client browser send?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> More than one: one for the HTML document and additional requests for each embedded object.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>2. To which Internet addresses were these GET requests sent?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> To the IP address(es) of the web server hosting the HTML page and potentially other IPs if objects are on different domains or CDNs.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>3. How many bytes of content are being returned for the <code class="bg-gray-800 text-accent-purple px-1 rounded">pearson-logo-footer.gif</code> image file?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Determined by the "Content-Length" header for that specific response (e.g., 12345 bytes).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>4. How many bytes of content are being returned for the <code class="bg-gray-800 text-accent-purple px-1 rounded">cover.jpg</code> image file?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Determined by the "Content-Length" header for that specific response (e.g., 54321 bytes).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part C.1 -->
+            <div class="card-bg rounded-xl p-8 mb-8 hover:shadow-lg transition-shadow duration-300">
+                <h3 class="text-3xl font-display font-semibold mb-6 text-accent-purple">Part C.1: DNS Trace - nslookup</h3>
+                <div class="space-y-6">
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>1. Run nslookup to obtain the IP address of a www.microsoft.com server. What is the IP address?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> (e.g., 20.203.189.100; IP addresses can vary).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>2. Run nslookup to determine the non-authoritative DNS servers for domain microsoft.com.</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> The "Server" line in <code class="bg-gray-800 text-accent-purple px-1 rounded">nslookup</code> output shows your local DNS server, which typically acts as a non-authoritative server for external domains. The "Non-authoritative answer" tag confirms this.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part C.3 -->
+            <div class="card-bg rounded-xl p-8 hover:shadow-lg transition-shadow duration-300">
+                <h3 class="text-3xl font-display font-semibold mb-6 text-accent-purple">Part C.3: Tracing DNS with Wireshark</h3>
+                <div class="space-y-6">
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>1. Locate the DNS query and response messages. Are they sent over UDP or TCP?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Standard DNS queries/responses are typically sent over <strong class="text-accent-cyan-light">UDP</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>2. What is the destination port for the DNS query message? What is the source port of the DNS response message?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Destination port for query: <strong class="text-accent-cyan-light">53 (DNS)</strong>. Source port for response: <strong class="text-accent-cyan-light">53 (DNS)</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>3. To what IP address is the DNS query message sent?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> The IP address of the <strong class="text-accent-cyan-light">default local DNS server</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>4. Examine the DNS query message. What “Type” of DNS query is it? Does the query message contain any “answers”?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Typically <strong class="text-accent-cyan-light">Type A</strong> (or AAAA). A query message <strong class="text-accent-cyan-light">does not contain answers</strong>; it has a "Questions" section.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>5. Examine the DNS response message. How many “answers” are provided? What do each of these answers contain?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Varies (e.g., 1, 2+). Each answer contains a resource record (RR) with domain name, Type, TTL, and data (e.g., IP address, CNAME).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>6. Does the destination IP address of the subsequent TCP SYN packet correspond to any of the IP addresses provided in the DNS response message?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> Yes, the destination IP of the SYN packet must match one of the IP addresses from the DNS response to initiate a connection.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header flex justify-between items-center w-full p-4 bg-gray-900 rounded-lg text-lg font-semibold focus-ring-cyan">
+                            <span>7. Before retrieving each image, does your host issue new DNS queries?</span>
+                            <span class="accordion-icon transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="accordion-content p-0 text-gray-400">
+                            <div class="pl-4 border-l border-accent-cyan-dark">
+                                <p><strong class="text-accent-cyan-light">Model Answer:</strong> New DNS queries are issued for images <strong class="text-accent-cyan-light">only if they are on a different domain</strong> and that domain's IP is <strong class="text-accent-cyan-light">not cached</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Concluding Summary -->
+        <section class="card-bg rounded-xl p-8 md:p-12 shadow-2xl relative z-20 hover:shadow-cyan-500/30 transition-shadow duration-300">
+            <h2 class="text-4xl font-display font-bold mb-6 text-gradient text-center">Concluding Summary of Chapter's Essence</h2>
+            <p class="text-lg leading-relaxed text-gray-300 text-center">
+                This chapter provides a foundational understanding of network communication by demystifying application layer protocols through practical packet analysis using Wireshark. It highlights the importance of passive observation in comprehending <strong class="text-accent-cyan-light">HTTP's web interactions</strong> and <strong class="text-accent-cyan-light">DNS's name resolution mechanism</strong>. By utilizing Wireshark's filtering and dissection capabilities alongside command-line tools like <code class="bg-gray-800 text-accent-purple px-2 py-1 rounded">nslookup</code> and <code class="bg-gray-800 text-accent-purple px-2 py-1 rounded">ipconfig</code>, students gain hands-on experience in dissecting network traffic, diagnosing network behaviors, and understanding the protocols that underpin the Internet. This practical exposure is crucial for network troubleshooting, security analysis, and system administration.
+            </p>
+        </section>
+
+    </div>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'background-primary': 'hsl(220, 20%, 8%)',
+                        'background-secondary': 'hsl(220, 15%, 12%)',
+                        'accent-cyan': 'hsl(180, 70%, 50%)',
+                        'accent-cyan-light': 'hsl(180, 80%, 65%)',
+                        'accent-cyan-dark': 'hsl(180, 60%, 40%)',
+                        'accent-purple': 'hsl(280, 70%, 60%)',
+                        'accent-purple-light': 'hsl(280, 80%, 75%)',
+                        'accent-purple-dark': 'hsl(280, 60%, 50%)',
+                        'text-primary': 'hsl(210, 10%, 90%)',
+                        'text-secondary': 'hsl(210, 5%, 70%)',
+                        'border-dark': 'hsl(220, 10%, 25%)',
+                    },
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+
+        // Accordion functionality for practice questions
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = header.querySelector('.accordion-icon');
+
+            header.addEventListener('click', () => {
+                const isActive = content.classList.contains('active');
+
+                // Close all other active accordions in the same group
+                document.querySelectorAll('.accordion-item').forEach(otherItem => {
+                    const otherContent = otherItem.querySelector('.accordion-content');
+                    const otherIcon = otherItem.querySelector('.accordion-icon');
+                    if (otherContent !== content && otherContent.classList.contains('active')) {
+                        otherContent.classList.remove('active');
+                        otherContent.style.maxHeight = '0';
+                        otherIcon.textContent = '+';
+                    }
+                });
+
+                if (isActive) {
+                    content.classList.remove('active');
+                    content.style.maxHeight = '0';
+                    icon.textContent = '+';
+                } else {
+                    content.classList.add('active');
+                    // Set max-height to scrollHeight to allow dynamic content height
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.textContent = '-';
+                }
+            });
+
+            // Recalculate max-height on window resize for responsiveness
+            window.addEventListener('resize', () => {
+                if (content.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

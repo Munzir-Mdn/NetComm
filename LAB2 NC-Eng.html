@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Addressing & Dynamic Routing Protocols Study Guide</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Lato"', 'sans-serif'],
+                        display: ['"Montserrat"', 'sans-serif'],
+                    },
+                    colors: {
+                        'blue-primary': 'hsl(210, 80%, 35%)',
+                        'blue-light': 'hsl(210, 60%, 80%)',
+                        'green-soft': 'hsl(150, 40%, 65%)',
+                        'bg-light': 'hsl(0, 0%, 98%)',
+                        'text-dark': 'hsl(0, 0%, 15%)',
+                        'accent-gold': 'hsl(40, 70%, 60%)',
+                        'accent-gold-dark': 'hsl(40, 70%, 50%)',
+                        'gray-subtle': 'hsl(0, 0%, 95%)',
+                        'gray-medium': 'hsl(0, 0%, 90%)',
+                        'red-alert': 'hsl(350, 70%, 55%)', /* For common mistakes */
+                        'purple-impact': 'hsl(270, 50%, 60%)', /* For real-world applications */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for a premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: hsl(0, 0%, 90%);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: hsl(210, 60%, 80%);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: hsl(210, 80%, 60%);
+        }
+
+        /* General body styling */
+        body {
+            font-family: 'Lato', sans-serif;
+            color: hsl(0, 0%, 15%);
+            background-color: hsl(0, 0%, 98%);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: hsl(210, 80%, 35%);
+            line-height: 1.2;
+            letter-spacing: 0.01em;
+        }
+
+        /* Subtle animation for details summary (Practice Questions) */
+        details summary {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background-color: hsl(0, 0%, 95%);
+            border: 1px solid hsl(0, 0%, 90%);
+            display: flex; /* Use flex for icon alignment */
+            justify-content: space-between;
+            align-items: center;
+        }
+        details summary:hover {
+            background-color: hsl(210, 60%, 90%);
+            border-color: hsl(210, 60%, 80%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        details[open] summary {
+            background-color: hsl(210, 60%, 85%);
+            border-color: hsl(210, 80%, 35%);
+        }
+        details summary::marker,
+        details summary::-webkit-details-marker {
+            display: none; /* Hide default marker */
+        }
+        .summary-title-wrapper {
+            position: relative;
+            padding-left: 2.25rem; /* Space for custom icon */
+            flex-grow: 1; /* Allow title to take up available space */
+        }
+        .summary-title-wrapper::before {
+            content: '+';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: hsl(210, 80%, 35%);
+            transition: transform 0.2s ease-in-out;
+            line-height: 1; /* Ensures vertical centering */
+        }
+        details[open] .summary-title-wrapper::before {
+            content: '-';
+            color: hsl(210, 80%, 35%);
+        }
+
+        /* Highlight for strong tags within content */
+        p strong, li strong, dd strong {
+            color: hsl(210, 80%, 35%); /* Primary blue for key terms */
+            font-weight: 700;
+        }
+        /* Specific strong tag styling for accents, e.g., in memory aids */
+        .card-title-accent {
+            color: var(--card-accent-color); /* Dynamically set by border color */
+        }
+    </style>
+</head>
+<body class="font-sans text-text-dark bg-bg-light p-4 md:p-8 lg:p-12 antialiased">
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl overflow-hidden">
+        <header class="text-center py-10 px-6 bg-gradient-to-br from-blue-primary to-green-soft text-white relative overflow-hidden rounded-t-3xl">
+            <div class="absolute inset-0 z-0 opacity-10">
+                <!-- Subtle background pattern or overlay for texture -->
+                <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <defs>
+                        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                            <path d="M 10 0 L 0 0 L 0 10" fill="none" stroke="currentColor" stroke-width="0.1" />
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" class="text-white opacity-20"/>
+                </svg>
+            </div>
+            <h1 class="font-display text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg relative z-10">
+                Comprehensive Study Guide
+            </h1>
+            <p class="text-xl md:text-2xl font-light opacity-90 relative z-10">
+                IP Addressing and Dynamic Routing Protocols (RIP & OSPF)
+            </p>
+        </header>
+
+        <main class="p-6 md:p-10 lg:p-12 space-y-12">
+
+            <!-- Summary Section -->
+            <section id="summary" class="bg-gray-subtle p-8 rounded-2xl shadow-lg border-l-8 border-blue-primary transition-all duration-300 hover:shadow-xl hover:border-l-[12px]">
+                <h2 class="font-display text-4xl font-bold mb-6 text-blue-primary">Summary</h2>
+                <p class="text-lg leading-relaxed">
+                    This study guide covers fundamental <strong>IP addressing</strong> and <strong>subnetting</strong>, along with the configuration and operation of <strong>dynamic routing protocols</strong>, specifically <strong>Routing Information Protocol (RIP)</strong> and <strong>Open Shortest Path First (OSPF)</strong>. It details calculating <strong>network addresses</strong>, <strong>broadcast addresses</strong>, and <strong>usable IP address ranges</strong>. The guide explains the purpose and function of <strong>routing tables</strong>, how routers learn network pathways dynamically, and the differences between <strong>static</strong> and <strong>dynamic routing</strong>. Practical application using <strong>Packet Tracer</strong> for CLI configurations and observing network effects is highlighted.
+                </p>
+            </section>
+
+            <!-- Key Concepts Section -->
+            <section id="key-concepts" class="p-8 rounded-2xl shadow-lg bg-white border-b-8 border-accent-gold transition-all duration-300 hover:shadow-xl hover:border-b-[12px]">
+                <h2 class="font-display text-4xl font-bold mb-8 text-blue-primary">Key Concepts</h2>
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">IP Addressing:</dt>
+                        <dd class="text-lg">A unique numerical label for devices in a computer network using the Internet Protocol.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Subnet Mask:</dt>
+                        <dd class="text-lg">A 32-bit number partitioning an IP address into network and host portions, defining a <strong>subnet</strong>.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Network Address:</dt>
+                        <dd class="text-lg">The identifier for a network segment, derived by a bitwise <strong>AND operation</strong> between an IP address and its subnet mask.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Broadcast Address:</dt>
+                        <dd class="text-lg">A special IP address within a subnet for sending data to all devices on that segment; obtained by setting all host bits of the network address to 1.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Range of Usable Addresses:</dt>
+                        <dd class="text-lg">IP addresses within a subnet assignable to host devices, excluding network and broadcast addresses.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Default Gateway:</dt>
+                        <dd class="text-lg">The IP address of a router interface used by a local host to send traffic outside its local subnet.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Routing Table:</dt>
+                        <dd class="text-lg">A database in a router or host listing paths to network destinations, used to determine the best forwarding path for data packets.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Dynamic Routing:</dt>
+                        <dd class="text-lg">A method where routers automatically discover network topologies and update <strong>routing tables</strong> without manual configuration, allowing networks to adapt to changes.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Routing Information Protocol (RIP):</dt>
+                        <dd class="text-lg">A <strong>distance-vector routing protocol</strong> using <strong>hop count</strong> as its metric. RIP version 2 supports Variable Length Subnet Masking (VLSM) and route summarization.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Open Shortest Path First (OSPF):</dt>
+                        <dd class="text-lg">A <strong>link-state routing protocol</strong> using <strong>cost</strong> (derived from bandwidth) as its metric. OSPF routers build a topological map (Link State Database) and use Dijkstra's algorithm. It supports <strong>areas</strong> for hierarchical design and is used in larger networks.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">Packet Tracer:</dt>
+                        <dd class="text-lg">A Cisco Systems network simulation tool for designing, configuring, and troubleshooting virtual network topologies.</dd>
+                    </div>
+                    <div class="space-y-2">
+                        <dt class="font-bold text-xl text-blue-primary">CLI (Command-Line Interface):</dt>
+                        <dd class="text-lg">A text-based method for interacting with and configuring network devices.</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <!-- Memory Aids Section -->
+            <section id="memory-aids" class="bg-gray-subtle p-8 rounded-2xl shadow-lg border-r-8 border-green-soft transition-all duration-300 hover:shadow-xl hover:border-r-[12px]">
+                <h2 class="font-display text-4xl font-bold mb-6 text-blue-primary">Memory Aids</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-soft hover:shadow-lg hover:translate-y-[-3px] transition-all duration-200" style="--card-accent-color: hsl(150, 40%, 65%);">
+                        <h3 class="font-display text-2xl font-semibold mb-2 text-green-soft card-title-accent">AND for Network</h3>
+                        <p class="text-lg">To find the <strong>Network Address</strong>, <strong>AND</strong> the IP address with the Subnet Mask.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-primary hover:shadow-lg hover:translate-y-[-3px] transition-all duration-200" style="--card-accent-color: hsl(210, 80%, 35%);">
+                        <h3 class="font-display text-2xl font-semibold mb-2 text-blue-primary card-title-accent">RIP's Simple Metric</h3>
+                        <p class="text-lg">RIP uses <strong>hop count</strong>; a maximum of 15 hops is supported.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-accent-gold hover:shadow-lg hover:translate-y-[-3px] transition-all duration-200" style="--card-accent-color: hsl(40, 70%, 60%);">
+                        <h3 class="font-display text-2xl font-semibold mb-2 text-accent-gold card-title-accent">OSPF's Optimal Path</h3>
+                        <p class="text-lg">OSPF uses <strong>cost</strong> (bandwidth-based) to calculate the fastest route.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-red-alert hover:shadow-lg hover:translate-y-[-3px] transition-all duration-200" style="--card-accent-color: hsl(350, 70%, 55%);">
+                        <h3 class="font-display text-2xl font-semibold mb-2 text-red-alert card-title-accent">Configuration Save (C-R-S-C)</h3>
+                        <p class="text-lg"><code>Copy Running-config Startup-config</code> – Save configurations to prevent loss on reboot.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Structured Study Guide Section -->
+            <section id="structured-guide" class="p-8 rounded-2xl shadow-lg bg-white border-l-8 border-r-8 border-blue-light transition-all duration-300 hover:shadow-xl hover:border-l-[12px] hover:border-r-[12px]">
+                <h2 class="font-display text-4xl font-bold mb-8 text-blue-primary">Structured Study Guide</h2>
+
+                <!-- What to Remember -->
+                <div class="mb-10 p-6 bg-gray-subtle rounded-xl shadow-inner border-t-4 border-accent-gold">
+                    <h3 class="font-display text-3xl font-bold mb-4 text-accent-gold">What to Remember</h3>
+                    <ul class="list-disc list-inside text-lg space-y-3 pl-4">
+                        <li><strong>Core IP Addressing:</strong> Understand IPv4 structure and how subnet masks divide networks.</li>
+                        <li><strong>Subnetting Essentials:</strong> Proficiently calculate network address, broadcast address, and usable IP range.</li>
+                        <li><strong>Router's Role:</strong> Forward packets based on routing tables for inter-network communication.</li>
+                        <li><strong>Dynamic Routing Purpose:</strong> Automate route discovery and adaptation for scalable networks.</li>
+                        <li><strong>RIP Characteristics:</strong> Distance-vector, hop-count metric, max 15 hops, periodic updates.</li>
+                        <li><strong>OSPF Characteristics:</strong> Link-state, cost metric (bandwidth-based), Dijkstra's algorithm, LSDB, scales with areas.</li>
+                        <li><strong>Basic CLI Commands:</strong> <code>enable</code>, <code>configure terminal</code>, <code>router rip/ospf</code>, <code>network</code>, <code>no auto-summary</code> (RIPv2), <code>area 0</code> (OSPF), <code>end</code>, <code>copy running-config startup-config</code>.</li>
+                    </ul>
+                </div>
+
+                <!-- How the Concepts Function -->
+                <div class="mb-10 p-6 bg-gray-subtle rounded-xl shadow-inner border-t-4 border-green-soft">
+                    <h3 class="font-display text-3xl font-bold mb-4 text-green-soft">How the Concepts Function</h3>
+                    <ul class="list-disc list-inside text-lg space-y-3 pl-4">
+                        <li><strong>Network Identification:</strong> Subnet mask bits (1s) identify the network portion; remaining bits (0s) are for hosts.</li>
+                        <li><strong>Packet Forwarding Logic:</strong> Router receives packet, checks destination IP against routing table, identifies best exit interface/next-hop, and forwards.</li>
+                        <li><strong>RIP Route Discovery:</strong> Routers periodically broadcast known routes (destination, hop count) to neighbors. Neighbors update if a lower hop count path is received.</li>
+                        <li><strong>OSPF Route Discovery:</strong> Routers exchange LSAs (link-state info) within an <strong>area</strong>. Each router builds an LSDB, runs SPF (Dijkstra) algorithm to create a shortest path tree, and populates its routing table.</li>
+                    </ul>
+                </div>
+
+                <!-- Common Mistakes -->
+                <div class="mb-10 p-6 bg-gray-subtle rounded-xl shadow-inner border-t-4 border-red-alert">
+                    <h3 class="font-display text-3xl font-bold mb-4 text-red-alert">Common Mistakes</h3>
+                    <ul class="list-disc list-inside text-lg space-y-3 pl-4">
+                        <li><strong>Incorrect Subnet Calculations:</strong> Errors in binary-to-decimal conversion or misapplying the AND operation.</li>
+                        <li><strong>Missing Default Gateway:</strong> Prevents communication outside the local subnet.</li>
+                        <li><strong>Not Saving Configurations:</strong> Volatile <code>running-config</code> changes are lost on reboot if not saved to <code>startup-config</code>.</li>
+                        <li><strong>Incorrect <code>network</code> Commands:</strong> Wrong network ID in RIP; incorrect wildcard mask or area ID in OSPF.</li>
+                        <li><strong>Interface Shutdown:</strong> Forgetting <code>no shutdown</code> command makes interfaces inactive.</li>
+                        <li><strong>Misinterpreting Routing Tables:</strong> Not understanding the meaning of route entry codes ('C', 'L', 'R', 'O').</li>
+                    </ul>
+                </div>
+
+                <!-- Effective Study Tips -->
+                <div class="mb-10 p-6 bg-gray-subtle rounded-xl shadow-inner border-t-4 border-blue-primary">
+                    <h3 class="font-display text-3xl font-bold mb-4 text-blue-primary">Effective Study Tips</h3>
+                    <ul class="list-disc list-inside text-lg space-y-3 pl-4">
+                        <li><strong>Practice, Practice, Practice:</strong> Use Packet Tracer for implementation, troubleshooting, and observing network behavior.</li>
+                        <li><strong>Draw Network Diagrams:</strong> Visually map IP addresses, subnets, interfaces, and connections.</li>
+                        <li><strong>Master Subnetting:</strong> Quickly calculate network addresses, broadcast addresses, and usable host ranges.</li>
+                        <li><strong>Understand <code>show</code> Commands:</strong> Familiarize with <code>show ip route</code>, <code>show ip protocols</code>, <code>show ip interface brief</code>, <code>show ip ospf neighbor</code> for verification and diagnosis.</li>
+                        <li><strong>Ping and Trace:</strong> Use <code>ping</code> for connectivity tests and <code>tracert</code>/<code>traceroute</code> to view packet paths.</li>
+                        <li><strong>Review Routing Table Entries:</strong> Understand each column (destination network, AD, metric, next-hop, exit interface).</li>
+                    </ul>
+                </div>
+
+                <!-- Real-World Applications -->
+                <div class="p-6 bg-gray-subtle rounded-xl shadow-inner border-t-4 border-purple-impact">
+                    <h3 class="font-display text-3xl font-bold mb-4 text-purple-impact">Real-World Applications</h3>
+                    <ul class="list-disc list-inside text-lg space-y-3 pl-4">
+                        <li><strong>Network Infrastructure Design:</strong> Fundamental for designing scalable, efficient, and reliable enterprise and data center networks.</li>
+                        <li><strong>Internet Service Providers (ISPs):</strong> Use dynamic routing protocols (BGP, OSPF) for global internet backbone management.</li>
+                        <li><strong>Cloud Computing:</strong> Virtual networks in cloud platforms (AWS, Azure, GCP) use similar IP addressing and routing concepts.</li>
+                        <li><strong>Network Troubleshooting:</strong> Crucial for diagnosing connectivity issues, routing loops, or unreachable destinations.</li>
+                        <li><strong>Cybersecurity:</strong> Understanding topology and routing paths is essential for implementing security measures, firewall rules, and intrusion detection.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Practice Questions Section -->
+            <section id="practice-questions" class="p-8 rounded-2xl shadow-lg bg-gray-subtle border-t-8 border-green-soft transition-all duration-300 hover:shadow-xl hover:border-t-[12px]">
+                <h2 class="font-display text-4xl font-bold mb-8 text-blue-primary">Practice Questions</h2>
+
+                <div class="space-y-6">
+                    <!-- Question 1 -->
+                    <details class="group">
+                        <summary>
+                            <span class="summary-title-wrapper">1. Objective: Which operation is used to derive the network address from an IP address and its subnet mask?</span>
+                            <svg class="h-6 w-6 text-blue-primary transform group-open:rotate-180 transition-transform duration-200 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </summary>
+                        <div class="px-6 py-4 mt-2 bg-white rounded-lg border border-blue-light shadow-inner text-lg">
+                            <ul class="list-none space-y-2 mb-4">
+                                <li>a) OR operation</li>
+                                <li>b) XOR operation</li>
+                                <li>c) AND operation</li>
+                                <li>d) NOT operation</li>
+                            </ul>
+                            <p class="font-bold text-lg text-green-soft">Model Answer: <span class="text-text-dark">c) AND operation</span></p>
+                        </div>
+                    </details>
+
+                    <!-- Question 2 -->
+                    <details class="group">
+                        <summary>
+                            <span class="summary-title-wrapper">2. Subjective: A network administrator assigns the IP address `172.16.20.100` with a subnet mask of `255.255.255.192` to a host.</span>
+                            <svg class="h-6 w-6 text-blue-primary transform group-open:rotate-180 transition-transform duration-200 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </summary>
+                        <div class="px-6 py-4 mt-2 bg-white rounded-lg border border-blue-light shadow-inner text-lg">
+                            <ul class="list-disc list-inside space-y-2 mb-4">
+                                <li>a) Determine the Network Address for this host.</li>
+                                <li>b) Determine the Broadcast Address for this subnet.</li>
+                                <li>c) What is the range of usable IP addresses for hosts in this subnet?</li>
+                            </ul>
+                            <p class="font-bold text-lg text-green-soft">Model Answer:</p>
+                            <ul class="list-disc list-inside text-text-dark space-y-2 pl-4">
+                                <li>IP Address: <code>172.16.20.100</code></li>
+                                <li>Subnet Mask: <code>255.255.255.192</code></li>
+                                <li>Last octet binary: 100 (<code>01100100</code>), 192 (<code>11000000</code>)</li>
+                                <li><strong>a) Network Address:</strong> <code>01100100</code> AND <code>11000000</code> = <code>01000000</code> (64 decimal). Network Address: <code>172.16.20.64</code>.</li>
+                                <li><strong>b) Broadcast Address:</strong> Set host bits (last 6 bits) of the network address (<code>01000000</code>) to all ones: <code>01111111</code> (127 decimal). Broadcast Address: <code>172.16.20.127</code>.</li>
+                                <li><strong>c) Range of usable IP addresses:</strong> From one after the network address to one before the broadcast address. Range: <code>172.16.20.65</code> to <code>172.16.20.126</code>.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- Question 3 -->
+                    <details class="group">
+                        <summary>
+                            <span class="summary-title-wrapper">3. Short Essay: Discuss the advantages of using dynamic routing protocols (like RIP or OSPF) over static routing in a large, complex network environment. Provide at least two distinct advantages and explain why they are beneficial.</span>
+                            <svg class="h-6 w-6 text-blue-primary transform group-open:rotate-180 transition-transform duration-200 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </summary>
+                        <div class="px-6 py-4 mt-2 bg-white rounded-lg border border-blue-light shadow-inner text-lg">
+                            <p class="font-bold text-lg text-green-soft">Model Answer:</p>
+                            <p class="text-text-dark mb-3">Dynamic routing protocols offer significant advantages over static routing in large, complex networks:</p>
+                            <ol class="list-decimal list-inside text-text-dark space-y-3 pl-4">
+                                <li><strong>Automatic Route Discovery and Adaptation:</strong> They automatically discover remote networks and build routing tables, eliminating manual configuration for every route. Crucially, they adapt to topology changes (link failures, new links) by recalculating routes, ensuring continuous connectivity and reducing downtime without human intervention.</li>
+                                <li><strong>Scalability and Reduced Administrative Overhead:</strong> As networks grow, dynamic routing automatically incorporates new subnets/routers. Static routing would require manual updates on every affected router, leading to immense administrative overhead and potential inconsistencies in large networks. Dynamic protocols provide a scalable solution that significantly reduces administrative burden.</li>
+                            </ol>
+                        </div>
+                    </details>
+
+                    <!-- Question 4 -->
+                    <details class="group">
+                        <summary>
+                            <span class="summary-title-wrapper">4. Objective: In OSPF, which primary metric is used to determine the best path to a destination?</span>
+                            <svg class="h-6 w-6 text-blue-primary transform group-open:rotate-180 transition-transform duration-200 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </summary>
+                        <div class="px-6 py-4 mt-2 bg-white rounded-lg border border-blue-light shadow-inner text-lg">
+                            <ul class="list-none space-y-2 mb-4">
+                                <li>a) Hop Count</li>
+                                <li>b) Bandwidth Cost</li>
+                                <li>c) Delay</li>
+                                <li>d) Reliability</li>
+                            </ul>
+                            <p class="font-bold text-lg text-green-soft">Model Answer: <span class="text-text-dark">b) Bandwidth Cost</span></p>
+                        </div>
+                    </details>
+
+                    <!-- Question 5 -->
+                    <details class="group">
+                        <summary>
+                            <span class="summary-title-wrapper">5. Subjective: What is the administrative distance for directly connected networks and routes learned via RIP, respectively? Explain the significance of administrative distance in router path selection.</span>
+                            <svg class="h-6 w-6 text-blue-primary transform group-open:rotate-180 transition-transform duration-200 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </summary>
+                        <div class="px-6 py-4 mt-2 bg-white rounded-lg border border-blue-light shadow-inner text-lg">
+                            <p class="font-bold text-lg text-green-soft">Model Answer:</p>
+                            <ul class="list-disc list-inside text-text-dark space-y-2 mb-4 pl-4">
+                                <li>Administrative Distance (AD) for directly connected networks: <strong>0</strong>.</li>
+                                <li>AD for routes learned via RIP: <strong>120</strong>.</li>
+                            </ul>
+                            <p class="font-bold text-lg text-green-soft">Significance of Administrative Distance:</p>
+                            <p class="text-text-dark">AD is a value (0-255) a router uses to rate the trustworthiness of routing information from different sources. When a router learns about the same destination network from multiple sources, it uses AD to select the most preferred route. A lower AD indicates a more trusted source. For example, a router will always prefer a directly connected route (AD 0) over a RIP route (AD 120) to the same destination, ensuring routes from more reliable sources are prioritized.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Concluding Summary Section -->
+            <section id="concluding-summary" class="bg-gradient-to-br from-blue-light to-green-soft p-8 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]">
+                <h2 class="font-display text-4xl font-bold mb-6 text-blue-primary">Concluding Summary</h2>
+                <p class="text-lg leading-relaxed text-text-dark opacity-90">
+                    This chapter explored network connectivity through <strong>IP addressing</strong> and <strong>dynamic routing protocols</strong>. We learned how IP addresses are structured and subnetted for efficient network design. The core learning involved configuring and understanding <strong>RIP</strong> (distance-vector, hop count) and <strong>OSPF</strong> (link-state, cost), and how routers build <strong>routing tables</strong>, discover paths automatically, and adapt to network changes. This knowledge is critical for enabling resilient and scalable network communications, with practical exercises emphasizing hands-on experience for seamless data flow.
+                </p>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

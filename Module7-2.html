@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All: Structured Exam Notes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS to ensure fonts are applied and handle specific styling */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+        code, pre {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Tailwind custom classes and base styles for a premium look */
+        .section-header {
+            @apply text-3xl md:text-4xl font-display font-bold text-accent-color mt-12 mb-6 pb-2 border-b-2 border-accent-color/30;
+        }
+        .content-card {
+            @apply bg-secondary-bg p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out border border-border-light;
+        }
+        .language-tab-container {
+            @apply flex flex-wrap gap-1 mb-4 -mt-2 -mx-2; /* Adjust margin to visually merge tabs */
+        }
+        .language-tab-button {
+            @apply px-4 py-2 rounded-t-md text-sm font-semibold transition-colors duration-200 ease-in-out cursor-pointer;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        .language-tab-button.active {
+            @apply bg-accent-color text-white shadow-md;
+        }
+        .language-tab-button:not(.active) {
+            @apply bg-primary-bg text-text-dark hover:bg-accent-color/20;
+        }
+        .answer-toggle-button {
+            @apply mt-4 px-4 py-2 bg-accent-color text-white rounded-md hover:bg-accent-hover transition-colors duration-200 ease-in-out flex items-center justify-between w-full cursor-pointer;
+        }
+        .answer-content {
+            @apply mt-2 p-4 bg-code-bg rounded-b-md border-t border-accent-color/30 text-text-dark;
+        }
+        .answer-content.hidden {
+            display: none;
+        }
+        /* Specific styling for code blocks in content */
+        .content-card code {
+            @apply bg-code-bg px-1 py-0.5 rounded text-sm font-mono;
+        }
+        .content-card pre code {
+            @apply block p-3 rounded-md overflow-x-auto;
+        }
+        /* Styling for important/highlighted text */
+        .content-card b, .content-card strong {
+            @apply text-accent-color; /* Use accent color for strong emphasis */
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-bg': 'hsl(210, 15%, 98%)',    /* Very light blue-grey */
+                        'secondary-bg': 'hsl(210, 15%, 94%)',  /* Slightly darker blue-grey for cards */
+                        'text-dark': 'hsl(210, 20%, 20%)',     /* Dark slate blue */
+                        'accent-color': 'hsl(200, 70%, 50%)',  /* Vibrant but calming blue */
+                        'accent-hover': 'hsl(200, 70%, 40%)',
+                        'border-light': 'hsl(210, 10%, 85%)',  /* Light grey border */
+                        'code-bg': 'hsl(210, 15%, 90%)',       /* Code block background */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'], /* Body text */
+                        display: ['Outfit', 'sans-serif'], /* Headings */
+                        mono: ['Fira Code', 'monospace'], /* Formulas, code */
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-primary-bg text-text-dark min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-primary-bg shadow-lg py-4 px-6 md:px-10 border-b border-border-light flex flex-col items-center justify-center">
+        <h1 class="text-3xl md:text-5xl font-display font-extrabold text-text-dark leading-tight">All</h1>
+        <p class="text-xl md:text-2xl font-sans text-accent-color font-light mt-1">Structured Exam Notes</p>
+    </header>
+
+    <main class="container mx-auto px-4 md:px-8 py-12 max-w-4xl">
+        <!-- Content will be dynamically rendered here by JavaScript -->
+    </main>
+
+    <script>
+        const sectionsData = [
+            // Section 1: Introduction to Wireless and Mobile Networks
+            {
+                id: "section-1",
+                title: { en: "1. Introduction to Wireless and Mobile Networks", ms: "1. Pengenalan kepada Rangkaian Wayarles dan Mudah Alih" },
+                content: [
+                    {
+                        type: "topicsSubtopics",
+                        data: {
+                            en: [
+                                "Background and Key Challenges",
+                                "Elements of a Wireless Network",
+                                "Wireless Network Taxonomy",
+                            ],
+                            ms: [
+                                "Latar Belakang dan Cabaran Utama",
+                                "Elemen Rangkaian Wayarles",
+                                "Taksonomi Rangkaian Wayarles",
+                            ]
+                        }
+                    },
+                    {
+                        type: "keyConcepts",
+                        data: {
+                            en: [
+                                { title: "Prevalence:", content: "Wireless (mobile) phone subscribers exceed wired subscribers (5:1). Wireless Internet-connected devices also equal wired devices." },
+                                { title: "Key Challenges:", content: "Efficient communication over wireless links; handling users who change their network attachment point while moving (mobility)." },
+                                { title: "Elements:", content: "Wireless hosts (laptops, smartphones), Base Station (BS) (relays packets between wired and wireless networks, e.g., cell towers, access points), Wireless Link (connects mobiles to BS, uses multiple access protocols)." },
+                                { title: "Distinction:", content: "\"Wireless does not always mean mobility.\" A device can be wireless but stationary." },
+                                { title: "Network Modes:", content: "<ul><li><b>Infrastructure Mode:</b> Uses a Base Station (AP) to connect mobile devices to a wired network; supports <b>Handoff</b>.</li><li><b>Ad hoc Mode:</b> Nodes communicate directly and self-organize without a Base Station.</li></ul>" },
+                                { title: "Taxonomy (Hops & Infrastructure):", content: "Single Hop (direct to BS), Multiple Hops (relay through nodes), Infrastructure-based (requires BS), No Infrastructure (no BS)." },
+                            ],
+                            ms: [
+                                { title: "Kelaziman:", content: "Pelanggan telefon wayarles (mudah alih) melebihi berwayar (5:1). Peranti Internet wayarles menyamai berwayar." },
+                                { title: "Cabaran Utama:", content: "Komunikasi cekap melalui pautan wayarles; mengendalikan pengguna yang menukar titik sambungan rangkaian semasa bergerak (mobiliti)." },
+                                { title: "Elemen:", content: "Hos Wayarles (komputer riba, telefon pintar), Stesen Pangkalan (BS) (menyampaikan paket antara rangkaian berwayar dan wayarles, cth., menara sel, titik akses), Pautan Wayarles (menghubungkan peranti mudah alih ke BS, menggunakan protokol akses berbilang)." },
+                                { title: "Perbezaan:", content: "\"Wayarles tidak selalu bermakna mudah alih.\" Peranti boleh wayarles tetapi pegun." },
+                                { title: "Mod Rangkaian:", content: "<ul><li><b>Mod Infrastruktur:</b> Menggunakan Stesen Pangkalan (AP) untuk menghubungkan peranti mudah alih ke rangkaian berwayar; menyokong <b>Penyerahan (Handoff)</b>.</li><li><b>Mod Ad hoc:</b> Nod berkomunikasi secara langsung dan mengatur diri tanpa Stesen Pangkalan.</li></ul>" },
+                                { title: "Taksonomi (Hop & Infrastruktur):", content: "Hop Tunggal (terus ke BS), Hop Berbilang (menghantar melalui nod), Berasaskan Infrastruktur (memerlukan BS), Tiada Infrastruktur (tiada BS)." },
+                            ]
+                        }
+                    },
+                    {
+                        type: "importantPoints",
+                        data: {
+                            en: [
+                                "Wireless and mobile networking are critical due to surpassing wired counterparts.",
+                                "Understanding \"wireless\" vs. \"mobility\" is fundamental.",
+                                "Base stations bridge wireless to wired networks; Ad hoc networks are self-organizing.",
+                            ],
+                            ms: [
+                                "Rangkaian wayarles dan mudah alih kritikal kerana mengatasi yang berwayar.",
+                                "Memahami \"wayarles\" vs. \"mudah alih\" adalah asas.",
+                                "Stesen pangkalan menjambatan wayarles ke rangkaian berwayar; rangkaian Ad hoc mengatur diri.",
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 2: Wireless Links and Network Characteristics
+            {
+                id: "section-2",
+                title: { en: "2. Wireless Links and Network Characteristics", ms: "2. Pautan Wayarles dan Ciri Rangkaian" },
+                content: [
+                    {
+                        type: "topicsSubtopics",
+                        data: {
+                            en: [
+                                "Differences from Wired Links",
+                                "Signal-to-Noise Ratio (SNR) and Bit Error Rate (BER)",
+                                "Problems with Multiple Wireless Senders/Receivers",
+                                "Code Division Multiple Access (CDMA)",
+                            ],
+                            ms: [
+                                "Perbezaan daripada Pautan Berwayar",
+                                "Nisbah Isyarat-ke-Bunyi (SNR) dan Kadar Ralat Bit (BER)",
+                                "Masalah dengan Penghantar/Penerima Wayarles Berbilang",
+                                "Akses Berbilang Pembahagian Kod (CDMA)",
+                            ]
+                        }
+                    },
+                    {
+                        type: "keyConcepts",
+                        data: {
+                            en: [
+                                { title: "Wireless Link Challenges:", content: "Decreased signal strength (attenuation), interference from other sources (shared frequencies), multi-path propagation (signal reflections causing distortion)." },
+                                { title: "SNR vs. BER:", content: "<ul><li><b>SNR:</b> Signal-to-Noise Ratio; higher is desirable.</li><li><b>BER:</b> Bit Error Rate; lower is desirable.</li><li><b>Trade-off:</b> Increasing transmission power increases SNR, decreasing BER. Physical layer can be chosen to meet BER and maximize throughput for a given SNR. SNR can change with mobility, requiring dynamic adaptation.</li></ul>" },
+                                { title: "Problems with Multiple Senders/Receivers:", content: "<ul><li><b>Hidden Terminal Problem:</b> Nodes A and C transmit to B but cannot hear each other, causing interference at B without A or C knowing.</li><li><b>Signal attenuation/fading:</b> Contributes to difficulty in sensing other transmissions.</li></ul>" },
+                                { title: "CDMA (Code Division Multiple Access):", content: "<ul><li><b>Principle:</b> Each user assigned a unique \"code\" (chipping sequence); all users share the same frequency band.</li><li><b>Mechanism:</b> Data multiplied by user's chipping sequence. Orthogonal codes minimize interference.</li><li><b>Encoding:</b> <code>Z_i,m = d_i * c_m</code></li><li><b>Decoding:</b> <code>d_i = (1/M) * &Sigma;(Z_i,m * c_m)</code> (inner product with receiver's code).</li></ul>" },
+                            ],
+                            ms: [
+                                { title: "Cabaran Pautan Wayarles:", content: "Kekuatan isyarat berkurang (pelemahan), gangguan daripada sumber lain (frekuensi kongsi), penyebaran berbilang laluan (pantulan isyarat menyebabkan herotan)." },
+                                { title: "SNR lwn. BER:", content: "<ul><li><b>SNR:</b> Nisbah Isyarat-ke-Bunyi; lebih tinggi lebih baik.</li><li><b>BER:</b> Kadar Ralat Bit; lebih rendah lebih baik.</li><li><b>Pertukaran:</b> Meningkatkan kuasa penghantaran meningkatkan SNR, mengurangkan BER. Lapisan fizikal boleh dipilih untuk memenuhi BER dan memaksimumkan daya tampung untuk SNR yang diberikan. SNR boleh berubah dengan mobiliti, memerlukan penyesuaian dinamik.</li></ul>" },
+                                { title: "Masalah dengan Penghantar/Penerima Berbilang:", content: "<ul><li><b>Masalah Terminal Tersembunyi:</b> Nod A dan C menghantar ke B tetapi tidak dapat mendengar satu sama lain, menyebabkan gangguan pada B tanpa A atau C menyedarinya.</li><li><b>Pelemahan/Pudaran Isyarat:</b> Menyumbang kepada kesukaran mengesan penghantaran lain.</li></ul>" },
+                                { title: "CDMA (Akses Berbilang Pembahagian Kod):", content: "<ul><li><b>Prinsip:</b> Setiap pengguna diberi \"kod\" unik (jujukan cip); semua pengguna berkongsi jalur frekuensi yang sama.</li><li><b>Mekanisme:</b> Data didarab dengan jujukan cip pengguna. Kod ortogonal meminimumkan gangguan.</li><li><b>Pengekodan:</b> <code>Z_i,m = d_i * c_m</code></li><li><b>Penyahkodan:</b> <code>d_i = (1/M) * &Sigma;(Z_i,m * c_m)</code> (hasil darab dalam dengan kod penerima).</li></ul>" },
+                            ]
+                        }
+                    },
+                    {
+                        type: "formulasExamples",
+                        data: {
+                            en: [
+                                {
+                                    title: "CDMA Encoding:",
+                                    formula: "<code>Z_i,m = d_i * c_m</code>",
+                                    example: "Example: <code>d=0</code> (-1), <code>c=(1, 1, -1, 1, 1, -1, -1, 1)</code> -> <code>Z=(-1, -1, 1, -1, -1, 1, 1, -1)</code>.",
+                                },
+                                {
+                                    title: "CDMA Decoding:",
+                                    formula: "<code>d_i = (1/M) * &Sigma;(Z_i,m * c_m)</code>",
+                                    example: "Example (cont.): <code>Z_rx=(-1, -1, 1, -1, -1, 1, 1, -1)</code>, <code>c=(1, 1, -1, 1, 1, -1, -1, 1)</code>, <code>M=8</code> -> <code>d_i = (1/8)*(-8) = -1</code> (decodes to 0).",
+                                },
+                            ],
+                            ms: [
+                                {
+                                    title: "Pengekodan CDMA:",
+                                    formula: "<code>Z_i,m = d_i * c_m</code>",
+                                    example: "Contoh: <code>d=0</code> (-1), <code>c=(1, 1, -1, 1, 1, -1, -1, 1)</code> -> <code>Z=(-1, -1, 1, -1, -1, 1, 1, -1)</code>.",
+                                },
+                                {
+                                    title: "Penyahkodan CDMA:",
+                                    formula: "<code>d_i = (1/M) * &Sigma;(Z_i,m * c_m)</code>",
+                                    example: "Contoh (sambungan): <code>Z_rx=(-1, -1, 1, -1, -1, 1, 1, -1)</code>, <code>c=(1, 1, -1, 1, 1, -1, -1, 1)</code>, <code>M=8</code> -> <code>d_i = (1/8)*(-8) = -1</code> (menyahkod kepada 0).",
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        type: "importantPoints",
+                        data: {
+                            en: [
+                                "Wireless links are inherently more unreliable than wired links due to physical phenomena.",
+                                "CDMA is a spread spectrum technique allowing multiple users to share bandwidth simultaneously using unique codes."
+                            ],
+                            ms: [
+                                "Pautan wayarles secara semula jadi lebih tidak boleh dipercayai daripada pautan berwayar disebabkan fenomena fizikal.",
+                                "CDMA ialah teknik spektrum sebaran yang membolehkan berbilang pengguna berkongsi jalur lebar serentak menggunakan kod unik."
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 3: WiFi: 802.11 Wireless LANs
+            {
+                id: "section-3",
+                title: { en: "3. WiFi: 802.11 Wireless LANs", ms: "3. WiFi: Rangkaian LAN Wayarles 802.11" },
+                content: [
+                    {
+                        type: "topicsSubtopics",
+                        data: {
+                            en: [
+                                "Overview and Standards",
+                                "802.11 LAN Architecture",
+                                "Channels and Association (Host-AP)",
+                                "802.11 MAC Protocol (CSMA/CA)",
+                                "Collision Avoidance: RTS-CTS Exchange",
+                                "802.11 Frame Structure",
+                                "Advanced Features (Rate Adaptation, Power Management)",
+                                "Bluetooth (802.15.1)",
+                            ],
+                            ms: [
+                                "Gambaran Keseluruhan dan Piawaian",
+                                "Seni Bina LAN 802.11",
+                                "Saluran dan Perkaitan (Hos-AP)",
+                                "Protokol MAC 802.11 (CSMA/CA)",
+                                "Pencegahan Perlanggaran: Pertukaran RTS-CTS",
+                                "Struktur Bingkai 802.11",
+                                "Ciri Lanjutan (Penyesuaian Kadar, Pengurusan Kuasa)",
+                                "Bluetooth (802.15.1)",
+                            ]
+                        }
+                    },
+                    {
+                        type: "keyConcepts",
+                        data: {
+                            en: [
+                                { title: "WiFi:", content: "IEEE 802.11 wireless LAN, uses <b>CSMA/CA</b>." },
+                                { title: "Standards:", content: "Evolved from 802.11b (11 Mbps, 2.4 GHz) to 802.11ax (WiFi 6, 14 Gbps, 2.4/5 GHz). 5G is cellular, not 802.11." },
+                                { title: "LAN Architecture:", content: "Access Point (AP) connects wireless hosts to wired network. Basic Service Set (BSS) is a \"cell\" with hosts and an AP (infrastructure mode). Ad hoc mode has direct host-to-host communication." },
+                                { title: "Channels and Association:", content: "802.11b/g/n use 2.4 GHz (channels 1, 6, 11 are non-overlapping). Host association involves <b>Passive Scanning</b> (listening for Beacon frames) or <b>Active Scanning</b> (sending Probe Requests). Host sends Association Request to AP, receives Association Response." },
+                                { title: "802.11 MAC Protocol (CSMA/CA):", content: "Avoids collisions (CD is difficult wirelessly).<ul><li><b>CSMA:</b> Sense before transmitting. If idle for DIFS, transmit.</li><li><b>Collision Avoidance:</b> If busy, start random backoff timer. Decrement when idle. Transmit when timer expires. Requires ACK; no ACK means increased backoff and retry.</li><li><b>RTS/CTS Exchange (Optional):</b> Sender sends RTS to AP; AP broadcasts CTS. All nodes hear CTS and defer, preventing hidden terminal collisions for data frames.</li></ul>" },
+                                { title: "Advanced Features:", content: "<ul><li><b>Rate Adaptation:</b> Dynamically adjusts transmission rate based on SNR.</li><li><b>Power Management:</b> Nodes can sleep; AP buffers frames and lists them in beacons. Nodes wake to check for buffered frames.</li></ul>" },
+                                { title: "Bluetooth (802.15.1):", content: "Short-range PAN (&lt;10m), ad hoc piconet (master + up to 8 slaves), 2.4-2.5 GHz, up to 3 Mbps." },
+                            ],
+                            ms: [
+                                { title: "WiFi:", content: "LAN wayarles IEEE 802.11, menggunakan <b>CSMA/CA</b>." },
+                                { title: "Piawaian:", content: "Berkembang daripada 802.11b (11 Mbps, 2.4 GHz) kepada 802.11ax (WiFi 6, 14 Gbps, 2.4/5 GHz). 5G adalah selular, bukan 802.11." },
+                                { title: "Seni Bina LAN:", content: "Titik Akses (AP) menghubungkan hos wayarles ke rangkaian berwayar. Set Perkhidmatan Asas (BSS) ialah \"sel\" dengan hos dan AP (mod infrastruktur). Mod Ad hoc mempunyai komunikasi hos-ke-hos langsung." },
+                                { title: "Saluran dan Perkaitan:", content: "802.11b/g/n menggunakan 2.4 GHz (saluran 1, 6, 11 tidak bertindih). Perkaitan hos melibatkan <b>Pengimbasan Pasif</b> (mendengar bingkai Suar) atau <b>Pengimbasan Aktif</b> (menghantar Permintaan Probing). Hos menghantar Permintaan Perkaitan ke AP, menerima Respons Perkaitan." },
+                                { title: "Protokol MAC 802.11 (CSMA/CA):", content: "Mengelakkan perlanggaran (CD sukar dalam wayarles).<ul><li><b>CSMA:</b> Mengesan sebelum menghantar. Jika terbiar untuk DIFS, hantar.</li><li><b>Pencegahan Perlanggaran:</b> Jika sibuk, mulakan pemasa backoff rawak. Kurangkan apabila terbiar. Hantar apabila pemasa tamat. Memerlukan ACK; tiada ACK bermakna backoff dan cuba semula meningkat.</li><li><b>Pertukaran RTS/CTS:</b> Penghantar menghantar RTS ke AP; AP menyiarkan CTS. Semua nod mendengar CTS dan menangguhkan, menghalang perlanggaran terminal tersembunyi untuk bingkai data.</li></ul>" },
+                                { title: "Ciri Lanjutan:", content: "<ul><li><b>Penyesuaian Kadar:</b> Melaraskan kadar penghantaran secara dinamik berdasarkan SNR.</li><li><b>Pengurusan Kuasa:</b> Nod boleh tidur; AP menyimpan bingkai dan menyenaraikannya dalam suar. Nod bangun untuk memeriksa bingkai yang disimpan.</li></ul>" },
+                                { title: "Bluetooth (802.15.1):", content: "PAN jarak dekat (&lt;10m), piconet ad hoc (induk + sehingga 8 hamba), 2.4-2.5 GHz, sehingga 3 Mbps." },
+                            ]
+                        }
+                    },
+                    {
+                        type: "importantPoints",
+                        data: {
+                            en: [
+                                "WiFi utilizes CSMA/CA to manage shared wireless medium access, including optional RTS/CTS to mitigate hidden terminal issues.",
+                                "Dynamic features like rate adaptation and power management enhance WiFi's efficiency and user experience."
+                            ],
+                            ms: [
+                                "WiFi menggunakan CSMA/CA untuk mengurus akses medium wayarles kongsi, termasuk RTS/CTS pilihan untuk mengurangkan masalah terminal tersembunyi.",
+                                "Ciri dinamik seperti penyesuaian kadar dan pengurusan kuasa meningkatkan kecekapan WiFi dan pengalaman pengguna."
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 4: Cellular Networks: 4G/5G
+            {
+                id: "section-4",
+                title: { en: "4. Cellular Networks: 4G/5G", ms: "4. Rangkaian Selular: 4G/5G" },
+                content: [
+                    {
+                        type: "topicsSubtopics",
+                        data: {
+                            en: [
+                                "Overview and Components",
+                                "GSM Generations (1G-5G)",
+                                "2G (Voice) Cellular Network Architecture",
+                                "3G (Voice + Data) Cellular Network Architecture (UMTS)",
+                                "4G: LTE (Long-Term Evolution) Architecture and Elements",
+                                "5G Cellular Networks (5G NR)",
+                                "4G/5G Compared to Wired Internet",
+                            ],
+                            ms: [
+                                "Gambaran Keseluruhan dan Komponen",
+                                "Generasi GSM (1G-5G)",
+                                "Seni Bina Rangkaian Selular 2G (Suara)",
+                                "Seni Bina Rangkaian Selular 3G (Suara + Data) (UMTS)",
+                                "Seni Bina dan Elemen 4G: LTE (Long-Term Evolution)",
+                                "Rangkaian Selular 5G (5G NR)",
+                                "Perbandingan 4G/5G dengan Internet Berwayar",
+                            ]
+                        }
+                    },
+                    {
+                        type: "keyConcepts",
+                        data: {
+                            en: [
+                                { title: "Overview:", content: "Terminology often based on GSM. \"Cellular\" refers to geographical regions covered by base stations." },
+                                { title: "Core Components:", content: "Cell (region), Base Station (BS) (access point), Mobile Switching Center (MSC) (connects cells to PSTN, manages mobility)." },
+                                { title: "GSM Generations:", content: "1G (Analog voice), 2G (Digital voice, SMS/MMS), 3G (Digital voice+data, broadband), 4G LTE (All-IP core, mobile broadband), 5G (High data rates, low latency, massive capacity)." },
+                                { title: "2G Architecture:", content: "BTS (Base Transceiver Station), BSC (Base Station Controller), BSS (BTS+BSC), MSC." },
+                                { title: "3G Architecture (UMTS):", content: "Parallel data network. UTRAN (UMTS Terrestrial Radio Access Network) with RNCs. 3G Core: SGSNs (deliver datagrams to/from mobile), GGSNs (gateway to Internet)." },
+                                { title: "4G LTE:", content: "<b>All-IP Core</b>, no voice/data separation. UE (User Equipment), eNodeB (Base Station), MME (Mobility Management), HSS (Subscriber Info), S-GW & P-GW (Data Routing/Internet Gateway). Uses <b>OFDM</b> (downstream) and time slots. Tunneling is extensive." },
+                                { title: "5G NR:", content: "10x peak rate, 10x lower latency, 100x capacity. Uses FR1 (450 MHz–6 GHz) and FR2 (24–52 GHz, millimeter wave). Uses <b>MIMO</b>. Millimeter wave requires dense pico-cell deployment." },
+                                { title: "4G/5G vs. Wired Internet:", content: "Similarities (edge/core, global network, common protocols, data/control plane, tunneling). Differences (wireless link layer, mobility as first-class, SIM identity, provider business model, global access/roaming)." },
+                            ],
+                            ms: [
+                                { title: "Gambaran Keseluruhan:", content: "Terminologi sering berdasarkan GSM. \"Selular\" merujuk kepada kawasan geografi yang diliputi oleh stesen pangkalan." },
+                                { title: "Komponen Teras:", content: "Sel (kawasan), Stesen Pangkalan (BS) (titik akses), Pusat Penukaran Mudah Alih (MSC) (menghubungkan sel ke PSTN, mengurus mobiliti)." },
+                                { title: "Generasi GSM:", content: "1G (Suara Analog), 2G (Suara Digital, SMS/MMS), 3G (Suara+Data Digital, jalur lebar), 4G LTE (Teras Semua-IP, jalur lebar mudah alih), 5G (Kadar data tinggi, kependaman rendah, kapasiti besar)." },
+                                { title: "2G Seni Bina:", content: "BTS (Stesen Pemancar Pangkalan), BSC (Pengawal Stesen Pangkalan), BSS (BTS+BSC), MSC." },
+                                { title: "3G Seni Bina (UMTS):", content: "Rangkaian data selari. UTRAN (Rangkaian Akses Radio Terrestrial UMTS) dengan RNC. Teras 3G: SGSN (menyampaikan datagram ke/dari mudah alih), GGSN (gerbang ke Internet)." },
+                                { title: "4G LTE:", content: "<b>Teras Semua-IP</b>, tiada pemisahan suara/data. UE (Peralatan Pengguna), eNodeB (Stesen Pangkalan), MME (Pengurusan Mobiliti), HSS (Maklumat Pelanggan), S-GW & P-GW (Penghalaan Data/Gerbang Internet). Menggunakan <b>OFDM</b> (hiliran) dan slot masa. Penyaluran meluas." },
+                                { title: "5G NR:", content: "10x kadar puncak, 10x kependaman lebih rendah, 100x kapasiti. Menggunakan FR1 (450 MHz–6 GHz) dan FR2 (24–52 GHz, gelombang milimeter). Menggunakan <b>MIMO</b>. Gelombang milimeter memerlukan penggunaan piko-sel padat." },
+                                { title: "4G/5G lwn. Internet Berwayar:", content: "Persamaan (pinggir/teras, rangkaian global, protokol umum, satah data/kawalan, penyaluran). Perbezaan (lapisan pautan wayarles, mobiliti sebagai perkhidmatan kelas pertama, identiti SIM, model perniagaan pembekal, akses global/perayauan)." },
+                            ]
+                        }
+                    },
+                    {
+                        type: "importantPoints",
+                        data: {
+                            en: [
+                                "Cellular networks have evolved through generations, moving from analog voice (1G) to all-IP, high-speed data networks (4G LTE, 5G NR).",
+                                "Key components like Base Stations, MSCs, and various gateways manage connectivity and mobility across vast geographical areas."
+                            ],
+                            ms: [
+                                "Rangkaian selular telah berkembang melalui beberapa generasi, beralih daripada suara analog (1G) kepada rangkaian data berkelajuan tinggi semua-IP (4G LTE, 5G NR).",
+                                "Komponen utama seperti Stesen Pangkalan, MSC, dan pelbagai gerbang menguruskan kesambungan dan mobiliti merentasi kawasan geografi yang luas."
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 5: Mobility Management: Principles and Protocols
+            {
+                id: "section-5",
+                title: { en: "5. Mobility Management: Principles and Protocols", ms: "5. Pengurusan Mobiliti: Prinsip dan Protokol" },
+                content: [
+                    {
+                        type: "topicsSubtopics",
+                        data: {
+                            en: [
+                                "Spectrum of Mobility",
+                                "Addressing in Mobility (Vocabulary)",
+                                "Routing to a Mobile Node (Network vs. End-System Approaches)",
+                                "Mobile IP (Indirect Routing, Agent Discovery, Registration)",
+                                "Handling Mobility in Cellular Networks (GSM Indirect Routing, Handoff)",
+                            ],
+                            ms: [
+                                "Spektrum Mobiliti",
+                                "Pengalamatan dalam Mobiliti (Perbendaharaan Kata)",
+                                "Penghalaan ke Nod Mudah Alih (Pendekatan Rangkaian lwn. Sistem Akhir)",
+                                "IP Mudah Alih (Penghalaan Tidak Langsung, Penemuan Ejen, Pendaftaran)",
+                                "Mengendalikan Mobiliti dalam Rangkaian Selular (Penghalaan Tidak Langsung GSM, Handoff)",
+                            ]
+                        }
+                    },
+                    {
+                        type: "keyConcepts",
+                        data: {
+                            en: [
+                                { title: "Spectrum of Mobility:", content: "No mobility (same network), Low mobility (disconnect/reconnect), High mobility (maintain connections during movement)." },
+                                { title: "Addressing Vocabulary:", content: "Home Network, Permanent Address, Home Agent (HA) (in home network), Visited Network, Care-of-Address (COA) (temporary IP in visited network), Foreign Agent (FA) (in visited network), Correspondent. Mobile uses Permanent Address (transparent to correspondent) and COA (used by HA for forwarding)." },
+                                { title: "Routing to Mobile:", content: "<ul><li><b>Network Approach:</b> Not scalable.</li><li><b>End-System Approach:</b><ul><li><b>Indirect Routing (via HA):</b> Correspondent -> HA (encapsulates) -> FA (decapsulates) -> Mobile. Mobile replies directly (triangle routing). Transparent to correspondent.</li><li><b>Direct Routing (Correspondent gets COA):</b> Correspondent -> FA (gets COA from HA) -> Mobile. Mobile replies directly. Overcomes triangle routing but not transparent.</li></ul></li></ul>" },
+                                { title: "Mobile IP (RFC 5944 for IPv4):", content: "Supports mobility.<ul><li><b>Agent Discovery:</b> HA/FA broadcast ICMP Agent Advertisements.</li><li><b>Registration:</b> Mobile registers COA with HA (via FA).</li></ul>" },
+                                { title: "Cellular Mobility (GSM):", content: "<ul><li><b>HLR (Home Location Register):</b> Stores permanent number, profile, current location.</li><li><b>VLR (Visitor Location Register):</b> Stores info for users currently in visited network.</li><li><b>Indirect Routing (Call Flow):</b> Call to Home MSC -> consults HLR for COA -> sets up call to Visited MSC -> completes call to mobile.</li><li><b>Handoff (Common MSC):</b> Reroutes call to new BS without interruption. Initiated by old BS. Old BS informs MSC; MSC sets up path to new BS; mobile confirms; old BS tells mobile to handoff; new BS activates channel; MSC reroutes call.</li></ul>" },
+                            ],
+                            ms: [
+                                { title: "Spektrum Mobiliti:", content: "Tiada mobiliti (rangkaian sama), Mobiliti rendah (putus/sambung semula), Mobiliti tinggi (kekalkan sambungan semasa bergerak)." },
+                                { title: "Perbendaharaan Kata Pengalamatan:", content: "Rangkaian Rumah, Alamat Kekal, Ejen Rumah (HA) (dalam rangkaian rumah), Rangkaian Lawatan, Alamat Peduli (COA) (IP sementara dalam rangkaian lawatan), Ejen Asing (FA) (dalam rangkaian lawatan), Koresponden. Peranti mudah alih menggunakan Alamat Kekal (telus kepada koresponden) dan COA (digunakan oleh HA untuk pemajuan)." },
+                                { title: "Penghalaan ke Mudah Alih:", content: "<ul><li><b>Pendekatan Rangkaian:</b> Tidak berskala.</li><li><b>Pendekatan Sistem Akhir:</b><ul><li><b>Penghalaan Tidak Langsung (melalui HA):</b> Koresponden -> HA (enkapsulasi) -> FA (nyahkapsulasi) -> Mudah Alih. Mudah alih membalas terus (penghalaan segi tiga). Telus kepada koresponden.</li><li><b>Penghalaan Langsung (Koresponden dapat COA):</b> Koresponden -> FA (dapat COA dari HA) -> Mudah Alih. Mudah alih membalas terus. Mengatasi masalah penghalaan segi tiga tetapi tidak telus.</li></ul></li></ul>" },
+                                { title: "IP Mudah Alih (RFC 5944 untuk IPv4):", content: "Menyokong mobiliti.<ul><li><b>Penemuan Ejen:</b> HA/FA menyiarkan Iklan Ejen ICMP.</li><li><b>Pendaftaran:</b> Mudah alih mendaftarkan COA dengan HA (melalui FA).</li></ul>" },
+                                { title: "Mobiliti Selular (GSM):", content: "<ul><li><b>HLR (Daftar Lokasi Rumah):</b> Menyimpan nombor kekal, profil, lokasi semasa.</li><li><b>VLR (Daftar Lokasi Pelawat):</b> Menyimpan maklumat untuk pengguna semasa dalam rangkaian lawatan.</li><li><b>Penghalaan Tidak Langsung (Aliran Panggilan):</b> Panggilan ke MSC Rumah -> rujuk HLR untuk COA -> sediakan panggilan ke MSC Lawatan -> selesaikan panggilan ke mudah alih.</li><li><b>Penyerahan (Handoff) (MSC Biasa):</b> Menghala semula panggilan ke BS baharu tanpa gangguan. Dimulakan oleh BS lama. BS lama maklumkan MSC; MSC sediakan laluan ke BS baharu; mudah alih sahkan; BS lama arahkan mudah alih untuk handoff; BS baharu aktifkan saluran; MSC hala semula panggilan.</li></ul>" },
+                            ]
+                        }
+                    },
+                    {
+                        type: "importantPoints",
+                        data: {
+                            en: [
+                                "Mobility management is crucial for maintaining seamless connectivity for moving devices.",
+                                "Mobile IP and cellular network protocols (like GSM's HLR/VLR) use different approaches (network vs. lower layer) to achieve this, often involving agents and temporary addresses (COA)."
+                            ],
+                            ms: [
+                                "Pengurusan mobiliti adalah penting untuk mengekalkan sambungan lancar bagi peranti bergerak.",
+                                "IP Mudah Alih dan protokol rangkaian selular (seperti HLR/VLR GSM) menggunakan pendekatan yang berbeza (rangkaian berbanding lapisan bawah) untuk mencapainya, sering melibatkan ejen dan alamat sementara (COA)."
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 6: Wireless and Mobility: Impact on Higher-Layer Protocols
+            {
+                id: "section-6",
+                title: { en: "6. Wireless and Mobility: Impact on Higher-Layer Protocols", ms: "6. Wayarles dan Mobiliti: Kesan terhadap Protokol Lapisan Lebih Tinggi" },
+                content: [
+                    {
+                        type: "topicsSubtopics",
+                        data: {
+                            en: [
+                                "Logical Impact",
+                                "Performance Impact",
+                            ],
+                            ms: [
+                                "Kesan Logik",
+                                "Kesan Prestasi",
+                            ]
+                        }
+                    },
+                    {
+                        type: "keyConcepts",
+                        data: {
+                            en: [
+                                { title: "Logical Impact:", content: "Minimal. Best-effort service model unchanged. TCP/UDP designed for various networks." },
+                                { title: "Performance Impact (Significant):", content: "<ul><li><b>Packet loss/delay:</b> Wireless links prone to bit-errors, causing retransmissions and delays. Handoffs add temporary delays.</li><li><b>TCP Misinterpretation:</b> TCP sees packet loss as congestion (not wireless errors), reducing congestion window and degrading performance.</li><li><b>Real-time Traffic:</b> Delay is problematic for voice/video.</li><li><b>Limited Bandwidth:</b> Wireless links generally have less bandwidth than wired.</li></ul>" },
+                            ],
+                            ms: [
+                                { title: "Kesan Logik:", content: "Minimal. Model perkhidmatan usaha terbaik tidak berubah. TCP/UDP direka untuk pelbagai rangkaian." },
+                                { title: "Kesan Prestasi (Signifikan):", content: "<ul><li><b>Kehilangan/kependaman paket:</b> Pautan wayarles terdedah kepada ralat bit, menyebabkan penghantaran semula dan kependaman. Handoff menambah kependaman sementara.</li><li><b>Salah Tafsiran TCP:</b> TCP melihat kehilangan paket sebagai kesesakan (bukan ralat wayarles), mengurangkan tetingkap kesesakan dan merosot prestasi.</li><li><b>Trafik Masa Nyata:</b> Kependaman bermasalah untuk suara/video.</li><li><b>Jalur Lebar Terhad:</b> Pautan wayarles umumnya mempunyai jalur lebar yang lebih sedikit daripada berwayar.</li></ul>" },
+                            ]
+                        }
+                    },
+                    {
+                        type: "importantPoints",
+                        data: {
+                            en: [
+                                "While higher-layer protocols like TCP/UDP are logically robust to wireless and mobility, their performance is significantly impacted by link characteristics (errors, delay, bandwidth limitations) and mobility events (handoffs).",
+                                "TCP's congestion control mechanisms can misinterpret wireless losses, leading to suboptimal performance."
+                            ],
+                            ms: [
+                                "Walaupun protokol lapisan lebih tinggi seperti TCP/UDP secara logiknya teguh terhadap wayarles dan mobiliti, prestasinya terjejas dengan ketara oleh ciri-ciri pautan (ralat, kependaman, batasan jalur lebar) dan peristiwa mobiliti (handoff).",
+                                "Mekanisme kawalan kesesakan TCP boleh menyalah tafsir kehilangan wayarles, menyebabkan prestasi tidak optimum."
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 7: Summary
+            {
+                id: "section-7",
+                title: { en: "7. Summary", ms: "7. Ringkasan" },
+                content: [
+                    {
+                        type: "summary",
+                        data: {
+                            en: "Wireless and mobile networks are dominant, presenting challenges like signal attenuation, interference, and multipath. CDMA handles multiple access. WiFi (802.11) uses CSMA/CA with RTS/CTS. Cellular networks evolved (1G-5G) for voice and high-speed data, with complex architectures (MSC, SGSN, GGSN, eNodeB, MME, S-GW, P-GW). Mobility management (Mobile IP, GSM Handoff) is crucial, using HA, FA, COA, HLR, VLR. While logically transparent, wireless and mobility significantly impact higher-layer protocols like TCP due to performance issues (packet loss, delay, bandwidth).",
+                            ms: "Rangkaian wayarles dan mudah alih dominan, mempersembahkan cabaran seperti pelemahan isyarat, gangguan, dan berbilang laluan. CDMA mengendalikan akses berbilang. WiFi (802.11) menggunakan CSMA/CA dengan RTS/CTS. Rangkaian selular berkembang (1G-5G) untuk suara dan data berkelajuan tinggi, dengan seni bina kompleks (MSC, SGSN, GGSN, eNodeB, MME, S-GW, P-GW). Pengurusan mobiliti (IP Mudah Alih, Handoff GSM) adalah kritikal, menggunakan HA, FA, COA, HLR, VLR. Walaupun secara logik telus, wayarles dan mobiliti memberi kesan ketara kepada protokol lapisan lebih tinggi seperti TCP disebabkan isu prestasi (kehilangan paket, kependaman, jalur lebar)."
+                        }
+                    }
+                ]
+            },
+            // Section 8: Connections Between Topics
+            {
+                id: "section-8",
+                title: { en: "8. Connections Between Topics", ms: "8. Hubungan antara Topik" },
+                content: [
+                    {
+                        type: "connections",
+                        data: {
+                            en: [
+                                "<b>Wireless Link Characteristics & MAC Protocols:</b> Link challenges (attenuation, interference, hidden terminal) drive MAC protocol design (CSMA/CA, RTS/CTS, CDMA).",
+                                "<b>Access Points (WiFi) vs. Base Stations (Cellular):</b> Both are entry points, but differ in underlying technology and network architecture (LAN vs. WAN).",
+                                "<b>Mobility Management (Mobile IP vs. Cellular):</b> Both maintain connectivity for moving hosts. Mobile IP uses HA/FA for network-layer routing (transparent). Cellular uses HLR/VLR/MSC for lower-layer routing and handoffs.",
+                                "<b>Tunneling:</b> Key mechanism in Mobile IP (HA to FA) and 4G LTE (eNodeB to S-GW/P-GW) to encapsulate and forward data to mobile hosts, ensuring continuous connectivity.",
+                                "<b>Impact on Higher Layers:</b> Wireless link characteristics and mobility management mechanisms directly affect higher-layer protocol performance (e.g., TCP misinterpreting wireless errors as congestion).",
+                            ],
+                            ms: [
+                                "<b>Ciri Pautan Wayarles & Protokol MAC:</b> Cabaran pautan (pelemahan, gangguan, terminal tersembunyi) mendorong reka bentuk protokol MAC (CSMA/CA, RTS/CTS, CDMA).",
+                                "<b>Titik Akses (WiFi) vs. Stesen Pangkalan (Selular):</b> Kedua-duanya adalah titik masuk, tetapi berbeza dalam teknologi asas dan seni bina rangkaian (LAN vs. WAN).",
+                                "<b>Pengurusan Mobiliti (IP Mudah Alih vs. Selular):</b> Kedua-duanya mengekalkan kesambungan untuk hos bergerak. IP Mudah Alih menggunakan HA/FA untuk penghalaan lapisan rangkaian (telus). Selular menggunakan HLR/VLR/MSC untuk penghalaan lapisan lebih rendah dan handoff.",
+                                "<b>Penyaluran (Tunneling):</b> Mekanisme utama dalam IP Mudah Alih (HA ke FA) dan 4G LTE (eNodeB ke S-GW/P-GW) untuk enkapsulasi dan pemajuan data kepada hos mudah alih, memastikan kesambungan berterusan.",
+                                "<b>Kesan terhadap Lapisan Lebih Tinggi:</b> Ciri pautan wayarles dan mekanisme pengurusan mobiliti secara langsung menjejaskan prestasi protokol lapisan lebih tinggi (cth., TCP salah tafsir ralat wayarles sebagai kesesakan).",
+                            ]
+                        }
+                    }
+                ]
+            },
+            // Section 9: Practice Questions
+            {
+                id: "section-9",
+                title: { en: "9. Practice Questions", ms: "9. Soalan Latihan" },
+                content: [
+                    {
+                        type: "practiceQuestion",
+                        question: {
+                            en: `
+                                <p><strong>CDMA Encoding/Decoding:</strong></p>
+                                <ul>
+                                    <li>Sender code <code>c = (1, -1, 1, -1)</code>.</li>
+                                    <li>i) Encoded output <code>Z</code> for data bit <code>d = 1</code>?</li>
+                                    <li>ii) Decoded data bit <code>d</code> if received <code>Z_rx = (1, -1, 1, -1)</code> and receiver uses same code <code>c</code>?</li>
+                                </ul>
+                            `,
+                            ms: `
+                                <p><strong>Pengekodan/Penyahkodan CDMA:</strong></p>
+                                <ul>
+                                    <li>Kod penghantar <code>c = (1, -1, 1, -1)</code>.</li>
+                                    <li>i) Output terkod <code>Z</code> untuk bit data <code>d = 1</code>?</li>
+                                    <li>ii) Bit data <code>d</code> yang dinyahkodkan jika diterima <code>Z_rx = (1, -1, 1, -1)</code> dan penerima menggunakan kod <code>c</code> yang sama?</li>
+                                </ul>
+                            `
+                        },
+                        answer: {
+                            en: `
+                                <ul>
+                                    <li>i) <code>Z = (1, -1, 1, -1)</code></li>
+                                    <li>ii) <code>d = (1/4) * ((1*1) + (-1*-1) + (1*1) + (-1*-1)) = (1/4) * 4 = 1</code>. Decoded bit is <code>1</code>.</li>
+                                </ul>
+                            `,
+                            ms: `
+                                <ul>
+                                    <li>i) <code>Z = (1, -1, 1, -1)</code></li>
+                                    <li>ii) <code>d = (1/4) * ((1*1) + (-1*-1) + (1*1) + (-1*-1)) = (1/4) * 4 = 1</code>. Bit yang dinyahkodkan ialah <code>1</code>.</li>
+                                </ul>
+                            `
+                        }
+                    },
+                    {
+                        type: "practiceQuestion",
+                        question: {
+                            en: `
+                                <p><strong>WiFi MAC Protocol:</strong> Explain the Hidden Terminal Problem in 802.11 and how RTS/CTS mitigates it.</p>
+                            `,
+                            ms: `
+                                <p><strong>Protokol MAC WiFi:</strong> Jelaskan Masalah Terminal Tersembunyi dalam 802.11 dan bagaimana RTS/CTS mengurangkannya.</p>
+                            `
+                        },
+                        answer: {
+                            en: `
+                                <p>Hidden Terminal Problem: Nodes A and C transmit to B but cannot hear each other, causing collision at B. RTS/CTS mitigation: Sender (A) sends RTS to AP (B); AP broadcasts CTS. All nodes (including C) hear CTS and defer, clearing channel for A's data transmission to B.</p>
+                            `,
+                            ms: `
+                                <p>Masalah Terminal Tersembunyi: Nod A dan C menghantar ke B tetapi tidak dapat mendengar satu sama lain, menyebabkan perlanggaran pada B. Pengurangan RTS/CTS: Penghantar (A) menghantar RTS ke AP (B); AP menyiarkan CTS. Semua nod (termasuk C) mendengar CTS dan menangguhkan, mengosongkan saluran untuk penghantaran data A ke B.</p>
+                            `
+                        }
+                    },
+                    {
+                        type: "practiceQuestion",
+                        question: {
+                            en: `
+                                <p><strong>4G LTE Architecture:</strong> List and describe four key elements and their functions.</p>
+                            `,
+                            ms: `
+                                <p><strong>Seni Bina 4G LTE:</strong> Senaraikan dan terangkan empat elemen utama serta fungsinya.</p>
+                            `
+                        },
+                        answer: {
+                            en: `
+                                <ul>
+                                    <li><strong>UE (User Equipment):</strong> End-user mobile device.</li>
+                                    <li><strong>eNodeB (Evolved Node B):</strong> LTE base station, handles radio communication.</li>
+                                    <li><strong>MME (Mobility Management Entity):</strong> Manages mobility, security, authentication.</li>
+                                    <li><strong>S-GW (Serving Gateway):</strong> Routes data packets between eNodeB and P-GW, handles mobility.</li>
+                                    <li><strong>P-GW (Packet Data Gateway):):</strong> Interface to external IP networks, assigns IP addresses.</li>
+                                </ul>
+                            `,
+                            ms: `
+                                <ul>
+                                    <li><strong>UE (Peralatan Pengguna):</strong> Peranti mudah alih pengguna akhir.</li>
+                                    <li><strong>eNodeB (Nod B Evolusi):</strong> Stesen pangkalan LTE, mengendalikan komunikasi radio.</li>
+                                    <li><strong>MME (Entiti Pengurusan Mobiliti):</strong> Menguruskan mobiliti, keselamatan, pengesahan.</li>
+                                    <li><strong>S-GW (Gerbang Perkhidmatan):</strong> Menghalakan paket data antara eNodeB dan P-GW, menguruskan mobiliti.</li>
+                                    <li><strong>P-GW (Gerbang Data Paket):</strong> Antara muka ke rangkaian IP luaran, memberikan alamat IP.</li>
+                                </ul>
+                            `
+                        }
+                    },
+                    {
+                        type: "practiceQuestion",
+                        question: {
+                            en: `
+                                <p><strong>Mobility Management Concepts:</strong> Distinguish Home Agent and Foreign Agent in Mobile IP, and explain Care-of-Address (COA).</p>
+                            `,
+                            ms: `
+                                <p><strong>Konsep Pengurusan Mobiliti:</strong> Bezakan Ejen Rumah dan Ejen Asing dalam IP Mudah Alih, dan jelaskan Alamat Peduli (COA).</p>
+                            `
+                        },
+                        answer: {
+                            en: `
+                                <ul>
+                                    <li><strong>Home Agent (HA):</strong> In mobile's home network, intercepts packets for mobile's permanent address and tunnels them to the mobile's current location.</li>
+                                    <li><strong>Foreign Agent (FA):</strong> In visited network, receives tunneled packets from HA, decapsulates, and forwards to mobile. Helps mobile register with HA.</li>
+                                    <li><strong>Care-of-Address (COA):</strong> Temporary IP address of the mobile in a visited network, indicating its current attachment point. HA uses COA to tunnel packets to the FA.</li>
+                                </ul>
+                            `,
+                            ms: `
+                                <ul>
+                                    <li><strong>Ejen Rumah (HA):</strong> Dalam rangkaian rumah mudah alih, memintas paket untuk alamat kekal mudah alih dan menyalurkannya ke lokasi semasa.</li>
+                                    <li><strong>Ejen Asing (FA):</strong> Dalam rangkaian lawatan, menerima paket yang disalurkan dari HA, menyahkapsulasi, dan memajukan ke mudah alih. Membantu mudah alih mendaftar dengan HA.</li>
+                                    <li><strong>Alamat Peduli (COA):</strong> Alamat IP sementara mudah alih dalam rangkaian lawatan, menunjukkan titik sambungan semasa. HA menggunakan COA untuk menyalurkan paket ke FA.</li>
+                                </ul>
+                            `
+                        }
+                    },
+                ]
+            },
+            // Section 10: Memory Aids
+            {
+                id: "section-10",
+                title: { en: "10. Memory Aids", ms: "10. Alat Bantuan Memori" },
+                content: [
+                    {
+                        type: "memoryAids",
+                        data: {
+                            en: [
+                                "<strong>Wireless Link Challenges:</strong> <strong>DIM</strong> the signal (D: Decreased strength, I: Interference, M: Multi-path).",
+                                "<strong>802.11 MAC Collision Avoidance:</strong> <strong>RTS-CTS</strong> *reserves the space*.",
+                                "<strong>CDMA Principle:</strong> <strong>Code Divides Many Access</strong>.",
+                                "<strong>4G LTE Core Network Elements:</strong> <strong>M.M.E. H.A.S. S.P.G.</strong> (MME, HSS, S-GW, P-GW).",
+                                "<strong>Mobility Addressing:</strong> <strong>H</strong>appy <strong>V</strong>isitors <strong>C</strong>an <strong>F</strong>ind <strong>A</strong>gents (Home Network, Visited Network, Care-of-Address, Foreign Agent).",
+                                "<strong>GSM Generations:</strong> <strong>1G-A</strong>nalog, <strong>2G-D</strong>igital Voice/SMS, <strong>3G-D</strong>ata/Voice, <strong>4G-A</strong>ll IP, <strong>5G-U</strong>biquitous.",
+                            ],
+                            ms: [
+                                "<strong>Cabaran Pautan Wayarles:</strong> <strong>DIM</strong> isyarat (D: Kekuatan isyarat berkurang, I: Gangguan, M: Berbilang laluan).",
+                                "<strong>Pencegahan Perlanggaran MAC 802.11:</strong> <strong>RTS-CTS</strong> *tempah ruang*.",
+                                "<strong>Prinsip CDMA:</strong> <strong>Kod Bahagikan Banyak Akses</strong>.",
+                                "<strong>Elemen Rangkaian Teras 4G LTE:</strong> <strong>M.M.E. H.A.S. S.P.G.</strong> (MME, HSS, S-GW, P-GW).",
+                                "<strong>Pengalamatan Mobiliti:</strong> <strong>H</strong>os <strong>V</strong>isits <strong>C</strong>ertain <strong>F</strong>oreign <strong>A</strong>reas (Rangkaian Rumah, Rangkaian Lawatan, Alamat Peduli, Ejen Asing).",
+                                "<strong>Generasi GSM:</strong> <strong>1G-A</strong>nalog, <strong>2G-D</strong>igital Suara/SMS, <strong>3G-D</strong>ata/Suara, <strong>4G-S</strong>emua IP, <strong>5G-U</strong>biquitous.",
+                            ]
+                        }
+                    }
+                ]
+            }
+        ];
+
+        const mainContent = document.querySelector('main');
+        let currentLang = 'en'; // Default language
+
+        function renderContent(lang) {
+            mainContent.innerHTML = ''; // Clear existing content
+            sectionsData.forEach(section => {
+                const sectionElement = document.createElement('section');
+                sectionElement.id = section.id;
+                sectionElement.className = 'mb-12';
+
+                // Section Title (Bilingual, but displayed as one for the main section title)
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.className = 'section-header';
+                sectionTitle.innerHTML = `${section.title.en} / ${section.title.ms}`;
+                sectionElement.appendChild(sectionTitle);
+
+                section.content.forEach((item, itemIndex) => {
+                    const cardWrapper = document.createElement('div');
+                    cardWrapper.className = 'content-card mb-4';
+
+                    const tabContainer = document.createElement('div');
+                    tabContainer.className = 'language-tab-container'; /* Use custom class for tabs */
+                    tabContainer.innerHTML = `
+                        <button class="language-tab-button ${lang === 'en' ? 'active' : ''}" data-lang="en" data-section-id="${section.id}" data-item-index="${itemIndex}">English</button>
+                        <button class="language-tab-button ${lang === 'ms' ? 'active' : ''}" data-lang="ms" data-section-id="${section.id}" data-item-index="${itemIndex}">Bahasa Melayu</button>
+                    `;
+                    cardWrapper.appendChild(tabContainer);
+
+                    const contentBody = document.createElement('div');
+                    contentBody.className = 'text-base leading-relaxed';
+
+                    if (item.type === 'topicsSubtopics' || item.type === 'importantPoints' || item.type === 'memoryAids' || item.type === 'connections') {
+                        const ul = document.createElement('ul');
+                        ul.className = 'list-disc pl-5 space-y-2';
+                        item.data[lang].forEach(point => {
+                            const li = document.createElement('li');
+                            li.innerHTML = point;
+                            ul.appendChild(li);
+                        });
+                        contentBody.appendChild(ul);
+                    } else if (item.type === 'keyConcepts') {
+                        const dl = document.createElement('dl');
+                        dl.className = 'space-y-3';
+                        item.data[lang].forEach(concept => {
+                            const dt = document.createElement('dt');
+                            dt.className = 'font-semibold text-lg text-accent-color';
+                            dt.innerHTML = concept.title;
+                            dl.appendChild(dt);
+                            const dd = document.createElement('dd');
+                            dd.className = 'ml-4 text-text-dark/90';
+                            dd.innerHTML = concept.content;
+                            dl.appendChild(dd);
+                        });
+                        contentBody.appendChild(dl);
+                    } else if (item.type === 'formulasExamples') {
+                        const div = document.createElement('div');
+                        item.data[lang].forEach(formulaItem => {
+                            div.innerHTML += `<p class="font-semibold text-lg text-accent-color mb-2">${formulaItem.title}</p>`;
+                            div.innerHTML += `<pre class="bg-code-bg p-3 rounded-md overflow-x-auto font-mono text-sm"><code>${formulaItem.formula}</code></pre>`;
+                            div.innerHTML += `<p class="mt-2 text-text-dark/90">${formulaItem.example}</p>`;
+                        });
+                        contentBody.appendChild(div);
+                    } else if (item.type === 'summary') {
+                        const p = document.createElement('p');
+                        p.innerHTML = item.data[lang];
+                        contentBody.appendChild(p);
+                    } else if (item.type === 'practiceQuestion') {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.innerHTML = item.question[lang];
+                        contentBody.appendChild(questionDiv);
+
+                        const answerToggle = document.createElement('button');
+                        answerToggle.className = 'answer-toggle-button';
+                        answerToggle.innerHTML = `Show Answer <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                        
+                        const answerContent = document.createElement('div');
+                        answerContent.className = 'answer-content hidden';
+                        answerContent.innerHTML = item.answer[lang];
+
+                        contentBody.appendChild(answerToggle);
+                        contentBody.appendChild(answerContent);
+
+                        answerToggle.addEventListener('click', () => {
+                            answerContent.classList.toggle('hidden');
+                            const svg = answerToggle.querySelector('svg');
+                            svg.classList.toggle('rotate-180');
+                            answerToggle.innerHTML = answerContent.classList.contains('hidden')
+                                ? `Show Answer <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`
+                                : `Hide Answer <svg class="w-4 h-4 ml-2 transform transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                        });
+                    }
+
+                    cardWrapper.appendChild(contentBody);
+                    sectionElement.appendChild(cardWrapper);
+                });
+                mainContent.appendChild(sectionElement);
+            });
+
+            // Add event listeners for language tabs after content is rendered
+            document.querySelectorAll('.language-tab-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const newLang = event.target.dataset.lang;
+                    const sectionId = event.target.dataset.sectionId;
+                    const itemIndex = parseInt(event.target.dataset.itemIndex, 10);
+                    
+                    // Find all tabs for this item and update their active state
+                    document.querySelectorAll(`[data-section-id="${sectionId}"][data-item-index="${itemIndex}"]`).forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    event.target.classList.add('active');
+
+                    // Find the parent content card and update its content
+                    const parentCard = event.target.closest('.content-card');
+                    const section = sectionsData.find(s => s.id === sectionId);
+                    const item = section.content[itemIndex];
+
+                    // Create a temporary div to reconstruct contentBody
+                    const tempContentBody = document.createElement('div');
+                    tempContentBody.className = 'text-base leading-relaxed';
+
+                    if (item.type === 'topicsSubtopics' || item.type === 'importantPoints' || item.type === 'memoryAids' || item.type === 'connections') {
+                        const ul = document.createElement('ul');
+                        ul.className = 'list-disc pl-5 space-y-2';
+                        item.data[newLang].forEach(point => {
+                            const li = document.createElement('li');
+                            li.innerHTML = point;
+                            ul.appendChild(li);
+                        });
+                        tempContentBody.appendChild(ul);
+                    } else if (item.type === 'keyConcepts') {
+                        const dl = document.createElement('dl');
+                        dl.className = 'space-y-3';
+                        item.data[newLang].forEach(concept => {
+                            const dt = document.createElement('dt');
+                            dt.className = 'font-semibold text-lg text-accent-color';
+                            dt.innerHTML = concept.title;
+                            dl.appendChild(dt);
+                            const dd = document.createElement('dd');
+                            dd.className = 'ml-4 text-text-dark/90';
+                            dd.innerHTML = concept.content;
+                            dl.appendChild(dd);
+                        });
+                        tempContentBody.appendChild(dl);
+                    } else if (item.type === 'formulasExamples') {
+                        const div = document.createElement('div');
+                        item.data[newLang].forEach(formulaItem => {
+                            div.innerHTML += `<p class="font-semibold text-lg text-accent-color mb-2">${formulaItem.title}</p>`;
+                            div.innerHTML += `<pre class="bg-code-bg p-3 rounded-md overflow-x-auto font-mono text-sm"><code>${formulaItem.formula}</code></pre>`;
+                            div.innerHTML += `<p class="mt-2 text-text-dark/90">${formulaItem.example}</p>`;
+                        });
+                        tempContentBody.appendChild(div);
+                    } else if (item.type === 'summary') {
+                        const p = document.createElement('p');
+                        p.innerHTML = item.data[newLang];
+                        tempContentBody.appendChild(p);
+                    } else if (item.type === 'practiceQuestion') {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.innerHTML = item.question[newLang];
+                        tempContentBody.appendChild(questionDiv);
+
+                        const answerToggle = document.createElement('button');
+                        answerToggle.className = 'answer-toggle-button';
+                        answerToggle.innerHTML = `Show Answer <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                        
+                        const answerContent = document.createElement('div');
+                        answerContent.className = 'answer-content hidden';
+                        answerContent.innerHTML = item.answer[newLang];
+
+                        tempContentBody.appendChild(answerToggle);
+                        tempContentBody.appendChild(answerContent);
+
+                        answerToggle.addEventListener('click', () => {
+                            answerContent.classList.toggle('hidden');
+                            const svg = answerToggle.querySelector('svg');
+                            svg.classList.toggle('rotate-180');
+                            answerToggle.innerHTML = answerContent.classList.contains('hidden')
+                                ? `Show Answer <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`
+                                : `Hide Answer <svg class="w-4 h-4 ml-2 transform transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                        });
+                    }
+
+                    // Replace the old content body with the new one
+                    const oldContentBody = parentCard.querySelector('.text-base.leading-relaxed');
+                    parentCard.replaceChild(tempContentBody, oldContentBody);
+                });
+            });
+        }
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContent(currentLang);
+        });
+    </script>
+</body>
+</html>

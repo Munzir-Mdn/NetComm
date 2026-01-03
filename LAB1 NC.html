@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Guide: Network Packet Analysis</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': 'hsl(210, 80%, 40%)',
+                        'soft-green': 'hsl(145, 60%, 45%)',
+                        'accent-gold': 'hsl(30, 70%, 50%)',
+                        'bg-light': 'hsl(0, 0%, 98%)',
+                        'text-dark': 'hsl(220, 10%, 15%)',
+                        'section-bg': 'hsl(0, 0%, 96%)',
+                        'card-bg': 'hsl(0, 0%, 100%)',
+                        'hover-glow': 'rgba(255, 255, 255, 0.1)',
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                        body: ['Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.2)',
+                        'inner-glow': 'inset 0 0 10px rgba(0,0,0,0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--tw-colors-bg-light);
+            color: var(--tw-colors-text-dark);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--tw-colors-primary-blue);
+        }
+        strong {
+            color: var(--tw-colors-accent-gold);
+            font-weight: 700;
+        }
+        .container {
+            max-width: 960px; /* Adjusted from 1024px to 960px for tighter academic focus */
+        }
+        .section-separator {
+            content: '';
+            display: block;
+            height: 2px;
+            width: 80px;
+            background: linear-gradient(to right, var(--tw-colors-primary-blue), var(--tw-colors-soft-green));
+            margin: 2rem auto 3rem auto;
+            border-radius: 9999px;
+        }
+        details > summary {
+            list-style: none; /* Hide default marker */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            position: relative;
+            padding-left: 2.5rem; /* Space for custom marker */
+        }
+        details > summary:hover {
+            background-color: var(--tw-colors-primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        details > summary::before {
+            content: '+';
+            position: absolute;
+            left: 1rem;
+            font-weight: bold;
+            font-size: 1.25rem;
+            transition: transform 0.2s ease;
+        }
+        details[open] > summary::before {
+            content: '-';
+            transform: rotate(0deg);
+        }
+        details[open] > summary {
+            background-color: var(--tw-colors-primary-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Add more subtle animations here as needed */
+        .card-hover-scale:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--tw-colors-primary-blue) 0%, var(--tw-colors-soft-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent; /* Fallback for browsers that don't support text fill color */
+        }
+    </style>
+</head>
+<body class="bg-bg-light text-text-dark antialiased px-4 sm:px-6 lg:px-8">
+    <div class="container mx-auto py-12">
+        <!-- Header -->
+        <header class="text-center mb-16 fade-in-up">
+            <h1 class="text-5xl md:text-6xl font-display font-extrabold leading-tight tracking-tight gradient-text drop-shadow-lg">
+                Panduan Kajian: Analisis Paket Rangkaian Menggunakan Wireshark, HTTP, dan DNS
+            </h1>
+            <p class="mt-4 text-xl text-gray-600 font-body font-light max-w-2xl mx-auto">
+                Mendalami Operasi Protokol Rangkaian Lapisan Aplikasi
+            </p>
+        </header>
+
+        <main>
+            <!-- Summary Section -->
+            <section class="mb-12 p-8 bg-card-bg rounded-xl shadow-md border-t-4 border-primary-blue animate-fade-in-up transition duration-300 ease-in-out hover:shadow-lg card-hover-scale">
+                <h2 class="text-3xl font-display font-semibold mb-6 pb-2 text-primary-blue border-b-2 border-soft-green">Ringkasan</h2>
+                <p class="text-lg leading-relaxed font-body">
+                    This study guide provides an in-depth understanding of network packet analysis at the application layer, using software tools like <strong>Wireshark</strong>, <strong>nslookup</strong>, and <strong>ipconfig</strong>. It explores how network protocols such as <strong>HTTP (Hypertext Transfer Protocol)</strong> and <strong>DNS (Domain Name System)</strong> operate by observing message sequences exchanged between protocol entities. A <strong>packet sniffer</strong>, like Wireshark, is a passive tool that captures copies of messages sent and received by a computer, allowing for detailed examination of protocol operations and their consequences. The guide also covers using Wireshark for HTTP and DNS traffic analysis, and command-line tools like <code>nslookup</code> for querying DNS servers and <code>ipconfig</code> for managing local network configurations and DNS cache.
+                </p>
+            </section>
+            <div class="section-separator"></div>
+
+            <!-- Key Concepts Section -->
+            <section class="mb-12 p-8 bg-section-bg rounded-xl shadow-md animate-fade-in-up transition duration-300 ease-in-out hover:shadow-lg card-hover-scale">
+                <h2 class="text-3xl font-display font-semibold mb-6 pb-2 text-primary-blue border-b-2 border-soft-green">Konsep Utama (Key Concepts)</h2>
+                <dl class="grid md:grid-cols-2 gap-x-8 gap-y-6 text-lg">
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Penyemak Paket (Packet Sniffer):</dt>
+                        <dd class="text-gray-700">A passive tool that captures copies of network messages sent or received by a computer. It observes traffic without sending packets itself.</dd>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Perpustakaan Penangkapan Paket (Packet Capture Library):</dt>
+                        <dd class="text-gray-700">The component of a packet sniffer that receives a copy of every link-layer frame sent or received.</dd>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Penganalisis Paket (Packet Analyzer):</dt>
+                        <dd class="text-gray-700">The component of a packet sniffer that displays the content of all fields in protocol messages and understands the structure of messages exchanged by protocols.</dd>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Wireshark:</dt>
+                        <dd class="text-gray-700">A popular network protocol analyzer software that allows users to capture and view data traffic flowing into and out of a network.</dd>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200 col-span-full">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Antaramuka Wireshark (Wireshark Interface):</dt>
+                        <dd class="text-gray-700">Consists of five main components:</dd>
+                        <ul class="list-disc list-inside ml-4 mt-2 text-gray-700">
+                            <li><strong>Menu Arahan (Command Menus):</strong> Standard drop-down menus for accessing Wireshark functions.</li>
+                            <li><strong>Medan Penapis Paparan Paket (Packet Display Filter Field):</strong> A field for entering filters to narrow down the displayed captured packets.</li>
+                            <li><strong>Tetingkap Senarai Paket (Packet-Listing Window):</strong> Displays a one-line summary of each captured packet.</li>
+                            <li><strong>Tetingkap Butiran Pengepala Paket (Packet-Header Details Window):</strong> Provides detailed information about a selected packet at each protocol layer (Ethernet, IP, TCP/UDP, HTTP, DNS).</li>
+                            <li><strong>Tetingkap Kandungan Paket (Packet-Contents Window):</strong> Displays the entire content of a captured frame in ASCII and hexadecimal format.</li>
+                        </ul>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Protokol HTTP (Hypertext Transfer Protocol):</dt>
+                        <dd class="text-gray-700">An application layer protocol used to retrieve web resources like HTML pages and images.</dd>
+                        <ul class="list-disc list-inside ml-4 mt-2 text-gray-700">
+                            <li><strong>Permintaan GET (GET Request):</strong> An HTTP request sent by a client to retrieve a specific resource from a server.</li>
+                            <li><strong>Tindak Balas HTTP (HTTP Response):</strong> A reply from the server to a client's HTTP request, containing the requested resource and a <strong>Kod Status (Status Code)</strong>.</li>
+                            <li><strong>Conditional GET:</strong> A type of GET request that includes an <code>If-Modified-Since</code> header to request a resource only if it has been modified since a specific date/time.</li>
+                        </ul>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Protokol DNS (Domain Name System):</dt>
+                        <dd class="text-gray-700">A distributed hierarchical naming system that translates human-readable domain names (e.g., <code>www.example.com</code>) into machine-readable IP addresses (e.g., <code>192.0.2.1</code>).</dd>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Nslookup:</dt>
+                        <dd class="text-gray-700">A command-line tool that allows a host to query any specified DNS server for DNS records.</dd>
+                    </div>
+                    <div class="p-5 bg-card-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <dt class="font-bold text-accent-gold mb-2 text-xl">Ipconfig:</dt>
+                        <dd class="text-gray-700">A command-line tool used to display current TCP/IP configuration information, including IP addresses, DNS server addresses, and to manage the DNS cache.</dd>
+                        <ul class="list-disc list-inside ml-4 mt-2 text-gray-700">
+                            <li><code>ipconfig /all</code>: Displays complete TCP/IP configuration information.</li>
+                            <li><code>ipconfig /displaydns</code>: Displays the content of the DNS resolver cache.</li>
+                            <li><code>ipconfig /flushdns</code>: Clears the DNS resolver cache.</li>
+                        </ul>
+                    </div>
+                </dl>
+            </section>
+            <div class="section-separator"></div>
+
+            <!-- Memory Aids Section -->
+            <section class="mb-12 p-8 bg-card-bg rounded-xl shadow-md border-t-4 border-soft-green animate-fade-in-up transition duration-300 ease-in-out hover:shadow-lg card-hover-scale">
+                <h2 class="text-3xl font-display font-semibold mb-6 pb-2 text-primary-blue border-b-2 border-accent-gold">Bantuan Memori (Memory Aids)</h2>
+                <div class="grid md:grid-cols-2 gap-6 text-lg">
+                    <div class="p-6 bg-section-bg rounded-lg border-l-4 border-accent-gold shadow-sm hover:shadow-md transition duration-200">
+                        <h3 class="font-bold text-xl text-accent-gold mb-2">Acronym for Wireshark Interface Components:</h3>
+                        <p class="text-gray-700"><strong>M</strong>en <strong>F</strong>ilter <strong>S</strong>enarai <strong>B</strong>utiran <strong>K</strong>andungan (Menu Arahan, Medan Penapis Paparan, Tetingkap Senarai Paket, Tetingkap Butiran Pengepala Paket, Tetingkap Kandungan Paket).</p>
+                    </div>
+                    <div class="p-6 bg-section-bg rounded-lg border-l-4 border-primary-blue shadow-sm hover:shadow-md transition duration-200">
+                        <h3 class="font-bold text-xl text-primary-blue mb-2">Analogy for Packet Sniffer:</h3>
+                        <p class="text-gray-700">Like a closed-circuit television (CCTV) camera that records all traffic on a network without interfering with or altering it.</p>
+                    </div>
+                    <div class="p-6 bg-section-bg rounded-lg border-l-4 border-soft-green shadow-sm hover:shadow-md transition duration-200">
+                        <h3 class="font-bold text-xl text-soft-green mb-2">Analogy for DNS:</h3>
+                        <p class="text-gray-700">Like the internet's phone book. You look up a name (domain name), and it gives you the number (IP address) to connect to it.</p>
+                    </div>
+                    <div class="p-6 bg-section-bg rounded-lg border-l-4 border-accent-gold shadow-sm hover:shadow-md transition duration-200">
+                        <h3 class="font-bold text-xl text-accent-gold mb-2"><code>ipconfig</code> Formula:</h3>
+                        <ul class="list-disc list-inside ml-4 text-gray-700">
+                            <li><code>ipconfig /all</code> = See <strong>all</strong> IP configuration.</li>
+                            <li><code>ipconfig /displaydns</code> = <strong>Display</strong> what's in the DNS cache.</li>
+                            <li><code>ipconfig /flushdns</code> = <strong>Flush</strong> everything in the DNS cache.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <div class="section-separator"></div>
+
+            <!-- Structured Study Guide Section -->
+            <section class="mb-12 p-8 bg-section-bg rounded-xl shadow-md animate-fade-in-up transition duration-300 ease-in-out hover:shadow-lg card-hover-scale">
+                <h2 class="text-3xl font-display font-semibold mb-6 pb-2 text-primary-blue border-b-2 border-primary-blue">Panduan Kajian Berstruktur (Structured Study Guide)</h2>
+
+                <div class="space-y-8 text-lg">
+                    <div class="p-6 bg-card-bg rounded-lg shadow-sm border-l-4 border-primary-blue hover:shadow-md transition duration-200">
+                        <h3 class="text-2xl font-display font-medium text-primary-blue mb-3">Apa yang Perlu Diingat (What to Remember):</h3>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                            <li>The basic function of a <strong>packet sniffer</strong> and <strong>Wireshark's</strong> role as a primary tool.</li>
+                            <li>The five main components of the <strong>Wireshark graphical user interface</strong> and their purposes.</li>
+                            <li><strong>HTTP application layer protocol</strong> concepts (GET requests, responses, status codes, Conditional GET).</li>
+                            <li>The role of <strong>DNS</strong> in translating domain names to IP addresses.</li>
+                            <li>The utility and basic commands of <code>nslookup</code> for DNS queries and <code>ipconfig</code> for managing IP configurations and DNS cache.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-6 bg-card-bg rounded-lg shadow-sm border-l-4 border-soft-green hover:shadow-md transition duration-200">
+                        <h3 class="text-2xl font-display font-medium text-soft-green mb-3">Bagaimana Konsep Berfungsi (How Concepts Function):</h3>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                            <li><strong>Wireshark:</strong> Captures copies of link-layer frames, then dissects and displays packet content at various protocol layers. Display filters are used to focus on specific traffic.</li>
+                            <li><strong>HTTP Interaction:</strong> A client sends a GET request to a server. The server processes the request and sends a response (including resource and status code) back to the client. Conditional GET reduces traffic by requesting resources only if they have been modified.</li>
+                            <li><strong>DNS Operation:</strong> When an application needs an IP address for a domain name, it sends a DNS query to a DNS server. The DNS server replies with the corresponding IP address. <code>nslookup</code> allows for manual queries.</li>
+                            <li><strong>Local IP and DNS Management (<code>ipconfig</code>):</strong> <code>ipconfig /all</code> reveals the system's network configuration, including DNS servers used. <code>ipconfig /displaydns</code> shows locally cached DNS records, while <code>ipconfig /flushdns</code> clears this cache for the most current information.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-6 bg-card-bg rounded-lg shadow-sm border-l-4 border-accent-gold hover:shadow-md transition duration-200">
+                        <h3 class="text-2xl font-display font-medium text-accent-gold mb-3">Kesilapan Lazim (Common Mistakes):</h3>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                            <li><strong>Failing to filter packets:</strong> Capturing too much data without proper filters can hinder analysis. Always use Wireshark display filters.</li>
+                            <li><strong>Misinterpreting HTTP status codes:</strong> Not understanding the meaning of different HTTP status codes (e.g., 200 OK, 304 Not Modified, 404 Not Found) can lead to incorrect analysis.</li>
+                            <li><strong>Assuming packet sniffers are active:</strong> Remember that packet sniffers are passive; they only observe and do not modify traffic.</li>
+                            <li><strong>Ignoring the DNS cache:</strong> Network issues are sometimes caused by stale DNS entries in the local cache. <code>ipconfig /flushdns</code> is often necessary.</li>
+                            <li><strong>Not distinguishing between authoritative and non-authoritative DNS servers:</strong> In <code>nslookup</code>, it's important to understand the source of DNS answers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-6 bg-card-bg rounded-lg shadow-sm border-l-4 border-primary-blue hover:shadow-md transition duration-200">
+                        <h3 class="text-2xl font-display font-medium text-primary-blue mb-3">Petua Belajar Berkesan (Effective Study Tips):</h3>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                            <li><strong>Practice with Wireshark:</strong> Capture your own traffic (browsing, using apps) and try filtering using <code>http</code>, <code>dns</code>, <code>tcp.port == 80</code>, etc.</li>
+                            <li><strong>Understand Protocol Layers:</strong> Relate each packet field seen in Wireshark to the OSI/TCP-IP model.</li>
+                            <li><strong>Run Commands Directly:</strong> Try <code>nslookup</code> and <code>ipconfig</code> on your own computer with different domains.</li>
+                            <li><strong>Diagram Message Flows:</strong> Visualize how HTTP requests or DNS queries move between clients and servers.</li>
+                            <li><strong>Consult Reference Materials:</strong> Recommended textbooks (e.g., Computer Networking: A Top-Down Approach) are excellent sources for protocol details.</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-6 bg-card-bg rounded-lg shadow-sm border-l-4 border-soft-green hover:shadow-md transition duration-200">
+                        <h3 class="text-2xl font-display font-medium text-soft-green mb-3">Aplikasi Dunia Nyata (Real-World Applications):</h3>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                            <li><strong>Network Troubleshooting:</strong> Diagnosing connectivity issues, slow network performance, or application errors by examining packet flows.</li>
+                            <li><strong>Security Analysis:</strong> Detecting suspicious network activity, malware, or unauthorized data exfiltration.</li>
+                            <li><strong>Protocol Development/Debugging:</strong> Verifying protocol implementations and debugging communication problems.</li>
+                            <li><strong>Network Performance Monitoring:</strong> Analyzing latency, packet retransmissions, and bandwidth utilization.</li>
+                            <li><strong>Educational Tool:</strong> Assisting engineers and students in understanding how network protocols function in practice.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <div class="section-separator"></div>
+
+            <!-- Practice Questions Section -->
+            <section class="mb-12 p-8 bg-card-bg rounded-xl shadow-md border-t-4 border-accent-gold animate-fade-in-up transition duration-300 ease-in-out hover:shadow-lg card-hover-scale">
+                <h2 class="text-3xl font-display font-semibold mb-6 pb-2 text-primary-blue border-b-2 border-soft-green">Soalan Latihan (Practice Questions)</h2>
+
+                <div class="space-y-6 text-lg">
+                    <details class="group bg-section-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <summary class="font-medium text-primary-blue p-5 rounded-lg text-xl flex items-center">
+                            <span class="flex-grow">1. Objective: What is the primary function of a packet sniffer like Wireshark?</span>
+                        </summary>
+                        <div class="p-5 border-t border-gray-200 bg-card-bg rounded-b-lg">
+                            <p class="font-bold text-accent-gold mb-2">Jawapan Model (Model Answer):</p>
+                            <p class="text-gray-700"><strong>C. Menangkap dan menganalisis mesej rangkaian.</strong></p>
+                            <p class="text-gray-600 italic mt-2">Packet sniffers are passive and do not send or modify packets. Their primary function is to observe and analyze.</p>
+                        </div>
+                    </details>
+
+                    <details class="group bg-section-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <summary class="font-medium text-primary-blue p-5 rounded-lg text-xl flex items-center">
+                            <span class="flex-grow">2. Subjective: Describe the five main components of the Wireshark graphical user interface used for packet analysis.</span>
+                        </summary>
+                        <div class="p-5 border-t border-gray-200 bg-card-bg rounded-b-lg">
+                            <p class="font-bold text-accent-gold mb-2">Jawapan Model (Model Answer):</p>
+                            <p class="text-gray-700"><strong>The five main components of the Wireshark graphical user interface are:</strong></p>
+                            <ul class="list-disc list-inside ml-4 mt-2 text-gray-700 space-y-1">
+                                <li><strong>Command Menus:</strong> Standard drop-down menus located at the top of the window, containing functions like File, Edit, View, Capture, Analyze, Statistics, and Help.</li>
+                                <li><strong>Packet Display Filter Field:</strong> A space where protocol names or other information can be entered to filter the information displayed in the packet listing window.</li>
+                                <li><strong>Packet-Listing Window:</strong> Displays a one-line summary for each captured packet, including packet number, time, source and destination addresses, protocol type, and protocol-specific information.</li>
+                                <li><strong>Packet-Header Details Window:</strong> Provides details about a selected packet, including information about the Ethernet frame, IP datagram, TCP/UDP segment, and higher-layer protocols. Details can be expanded or collapsed.</li>
+                                <li><strong>Packet-Contents Window:</strong> Displays the entire content of a captured frame, in both ASCII and hexadecimal formats.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="group bg-section-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <summary class="font-medium text-primary-blue p-5 rounded-lg text-xl flex items-center">
+                            <span class="flex-grow">3. Short Essay: Differentiate between a regular HTTP GET request and an HTTP Conditional GET. Why is Conditional GET important in web optimization?</span>
+                        </summary>
+                        <div class="p-5 border-t border-gray-200 bg-card-bg rounded-b-lg">
+                            <p class="font-bold text-accent-gold mb-2">Jawapan Model (Model Answer):</p>
+                            <p class="text-gray-700"><strong>Difference between a regular HTTP GET request and an HTTP Conditional GET:</strong></p>
+                            <ul class="list-disc list-inside ml-4 mt-2 text-gray-700 space-y-1">
+                                <li><strong>Regular HTTP GET:</strong> When a browser makes a regular GET request for a resource (e.g., an HTML file or image), the server will always send back the entire content of that resource, regardless of whether the browser already has it or whether the resource has changed since it was last accessed.</li>
+                                <li><strong>HTTP Conditional GET:</strong> This is a GET request that includes an <code>If-Modified-Since:</code> (or <code>If-None-Match:</code>) header. With this header, the server checks if the requested resource has been modified since the date/time specified by the client.
+                                    <ul class="list-circle list-inside ml-4 text-gray-700">
+                                        <li>If the resource <strong>has been modified</strong>, the server will send the entire content of the resource with a <code>200 OK</code> status code.</li>
+                                        <li>If the resource <strong>has not been modified</strong>, the server will send a <code>304 Not Modified</code> status code without sending the resource's body content. This tells the client to use the version of the resource stored in its local cache.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p class="text-gray-700 mt-4"><strong>Importance of Conditional GET in web optimization:</strong></p>
+                            <p class="text-gray-700">Conditional GET is crucial for web optimization as it helps reduce network traffic and page load times. By avoiding the retransmission of unchanged content, it saves bandwidth for both the server and the client, and reduces the load on the server. This results in a faster and more efficient browsing experience for users.</p>
+                        </div>
+                    </details>
+
+                    <details class="group bg-section-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <summary class="font-medium text-primary-blue p-5 rounded-lg text-xl flex items-center">
+                            <span class="flex-grow">4. Subjective: Explain how the <code>nslookup</code> and <code>ipconfig</code> tools aid in diagnosing DNS-related issues on a local host.</span>
+                        </summary>
+                        <div class="p-5 border-t border-gray-200 bg-card-bg rounded-b-lg">
+                            <p class="font-bold text-accent-gold mb-2">Jawapan Model (Model Answer):</p>
+                            <p class="text-gray-700"><strong>The <code>nslookup</code> and <code>ipconfig</code> tools aid in diagnosing DNS-related issues on a local host as follows:</strong></p>
+                            <ul class="list-disc list-inside ml-4 mt-2 text-gray-700 space-y-1">
+                                <li><strong>Nslookup:</strong>
+                                    <ul class="list-circle list-inside ml-4 text-gray-700">
+                                        <li>Allows users to directly query DNS servers to resolve domain names to IP addresses, or to retrieve other DNS record information (e.g., MX, NS).</li>
+                                        <li>It is very useful for verifying whether DNS servers are functioning correctly and whether the correct DNS records are being returned. If <code>nslookup</code> fails to resolve a domain name, it indicates a problem with the configured DNS server or with the DNS records themselves.</li>
+                                        <li>For example, <code>nslookup google.com</code> will show the IP address for google.com and the DNS server used for the query.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ipconfig:</strong>
+                                    <ul class="list-circle list-inside ml-4 text-gray-700">
+                                        <li><strong><code>ipconfig /all</code></strong>: Displays the complete TCP/IP configuration of the local host, including IP address, subnet mask, default gateway, and the DNS server addresses currently being used by the system. This helps verify if the host is configured with the correct DNS servers.</li>
+                                        <li><strong><code>ipconfig /displaydns</code></strong>: Displays the content of the local DNS resolver cache. This shows domain names and their corresponding IP addresses that the system has recently resolved. It is useful for seeing if incorrect DNS entries have been cached, which could lead to website access problems.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p class="text-gray-700 mt-4">By using both tools, technicians can determine if a domain name resolution problem stems from the local host's configuration, the DNS server, or issues with the DNS cache.</p>
+                        </div>
+                    </details>
+
+                    <details class="group bg-section-bg rounded-lg shadow-sm hover:shadow-md transition duration-200">
+                        <summary class="font-medium text-primary-blue p-5 rounded-lg text-xl flex items-center">
+                            <span class="flex-grow">5. Subjective: Why is it important to clear the DNS cache using <code>ipconfig /flushdns</code> in certain situations? Provide an example.</span>
+                        </summary>
+                        <div class="p-5 border-t border-gray-200 bg-card-bg rounded-b-lg">
+                            <p class="font-bold text-accent-gold mb-2">Jawapan Model (Model Answer):</p>
+                            <p class="text-gray-700"><strong>It is important to clear the DNS cache using <code>ipconfig /flushdns</code> in certain situations to ensure the system always retrieves the most up-to-date domain name resolution information.</strong></p>
+                            <p class="text-gray-700 mt-2"><strong>Example situations:</strong></p>
+                            <ul class="list-disc list-inside ml-4 mt-2 text-gray-700 space-y-1">
+                                <li><strong>Web Server IP Address Changes:</strong> When a web server's IP address has changed, but your local system is still trying to connect to the old IP address because the old entry is cached. Clearing the cache will force the system to make a new DNS query and obtain the correct IP address.</li>
+                                <li><strong>Website Access Problems:</strong> If you cannot reach a specific website, even though others can, it might be due to a corrupted or invalid DNS entry in your local cache. Flushing the cache can resolve this issue.</li>
+                                <li><strong>Web Development/Testing:</strong> Web developers may need to clear the DNS cache when they change DNS configurations for domains they are working on, to ensure they are always accessing the latest version of the site.</li>
+                                <li><strong>Investigating Security Threats:</strong> In some cases, malware can alter DNS entries in the local cache. Clearing the cache can help remove such malicious entries.</li>
+                            </ul>
+                            <p class="text-gray-700 mt-4">With <code>ipconfig /flushdns</code>, the Windows resolver DNS cache is cleared, forcing the system to obtain fresh DNS information from the DNS server whenever a domain name is needed.</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+            <div class="section-separator"></div>
+
+            <!-- Concluding Summary Section -->
+            <section class="mb-12 p-8 bg-section-bg rounded-xl shadow-md border-t-4 border-primary-blue animate-fade-in-up transition duration-300 ease-in-out hover:shadow-lg card-hover-scale">
+                <h2 class="text-3xl font-display font-semibold mb-6 pb-2 text-primary-blue border-b-2 border-soft-green">Ringkasan Akhir Bab (Concluding Summary)</h2>
+                <p class="text-lg leading-relaxed font-body">
+                    This chapter emphasizes the importance of packet analysis in understanding network operations. Through the use of <strong>Wireshark</strong>, students can directly observe the interactions of application layer protocols like <strong>HTTP</strong> and <strong>DNS</strong>, examine message structures, and understand how data is sent and received. Learning about HTTP GET requests, responses, and Conditional GET provides insight into how web pages are delivered and optimized. Meanwhile, exploring DNS through Wireshark, <code>nslookup</code>, and <code>ipconfig</code> reveals the fundamental mechanisms of translating domain names to IP addresses, which are the backbone of the Internet. These skills are essential for anyone looking to delve deeper into computer networking, whether for troubleshooting, security, or system development.
+                </p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
