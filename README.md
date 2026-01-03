@@ -13,7 +13,7 @@ This project reflects a structured approach to learning network communication, e
 ## Project Structure
 
 - `index.html` – Main navigation page linking all study modules  
-- `Module1–Module6.html` – Core networking theory modules  
+- `Module1–Module7.html` – Core networking theory modules  
 - `LAB*.html` – Practical lab exercises supporting theoretical concepts  
 
 ## Learning Outcomes
