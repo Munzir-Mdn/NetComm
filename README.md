@@ -2,6 +2,10 @@
 
 NetComm is a structured academic portfolio repository containing HTML-based study modules for the subject of Network Communication and Computer Networking fundamentals. This project is designed as a self-learning and reference resource that integrates theoretical explanations with practical lab-oriented content, presented in a clean, browser-accessible format.
 
+The complete module set is accessible through a live web interface hosted via GitHub Pages, allowing users to explore the content without cloning the repository or setting up a local environment.
+
+🌐 Live Website: https://munzir-mdn.github.io/NetComm/
+
 The repository consolidates multiple learning modules covering core networking layers and concepts, including the Application Layer, Transport Layer, Network Layer (Control Plane and Data Plane), and Link Layer. Each module is developed as a standalone HTML document, allowing users to navigate and study the content without requiring additional frameworks or runtime environments. A central index page is provided to enable systematic navigation across all modules.
 
 This project reflects a structured approach to learning network communication, emphasizing conceptual clarity, modular organization, and accessibility. It is suitable for undergraduate students in Computer Science, Network Engineering, and Cyber Security, as well as for educators seeking lightweight teaching materials or revision notes.
@@ -23,15 +27,16 @@ Through this repository, learners are able to:
 ## Technologies Used
 
 - HTML5 for content structure and presentation  
-- Browser-based navigation without external dependencies  
+- GitHub Pages for web-based deployment  
+- Fully client-side implementation with no external dependencies  
 
 ## Usage
 
-Clone the repository and open `index.html` using any modern web browser. All modules are fully client-side and require no server configuration.
+Users may either access the live website directly or clone the repository for offline use. To use locally, clone the repository and open `index.html` using any modern web browser.
 
 ## Purpose and Scope
 
-This repository is developed as part of an academic learning journey and portfolio documentation. It demonstrates disciplined self-study, technical documentation skills, and foundational knowledge in network communication. The content is intended for educational use and continuous improvement.
+This repository is developed as part of an academic learning journey and professional portfolio. It demonstrates disciplined self-study, technical documentation skills, and foundational knowledge in network communication. The content is intended for educational use and continuous improvement.
 
 ## Contributions
 
@@ -39,4 +44,4 @@ Contributions, corrections, or enhancements that improve clarity, accuracy, or s
 
 ## Author
 
-Developed and maintained by **Muhammad Munzir** as part of an academic and professional learning portfolio in Network and Cyber Security.
+Developed and maintained by **Muhammad Munzir** as part of an academic and professional portfolio in Network and Cyber Security.
